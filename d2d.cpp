@@ -64,6 +64,7 @@ const char* d2d_cmd [] = {
 	"service",
 	"channel",
 	"payload",
+	"help",
 	"quit",
 	" "
 };
@@ -130,8 +131,20 @@ const char* payload_handle_cmd [] = {
 };
 
 
+static const std::string __error_cmd = "ERR";
+
 // Current command
 std::vector<std::string> __command;
+
+
+bool is_cmd(const std::string &word, const char **table, int size) {
+	for(int i = 0; i < size; i ++) {
+		std::string s = table[i];
+		if(word == s)
+			return true;
+	}
+	return false;
+}
 
 static std::string trim(const char *buf) {
 	std::string str(buf);
@@ -151,7 +164,7 @@ int main()
 	rl_attempted_completion_function = my_completion;
 
 	char *buf = NULL;
-	while((buf = readline(" D2D >> "))!=NULL) {
+	while((buf = readline(" D2D >> ")) != NULL) {
 		const std::string command = trim(buf);
 		free(buf);
 
@@ -165,92 +178,101 @@ int main()
 }
 
 
-static char** my_completion( const char * text , int start,  int end)
+static char** my_completion( const char *text , int start,  int end)
 {
-	//printf("\n\t\t\t   ...my_completion params: [%s], %d, %d\n", text, start, end);
+	//printf(">\n\t\t\t   ...my_completion params: [%s], %d, %d\n", text, start, end);
 	return rl_completion_matches ((char*)text, &my_generator);
 }
 
-char* my_generator(const char* text, int state)
-{
-	//printf("\n\t\t\t   ...my_generator params: [%s], %d\n", text, state);
-	static int list_index = 0, len;
-
-	if (!state) {
-		list_index = 0;
-		len = strlen (text);
-	}
-
-	/*std::stringstream ss(text);
+void pre_parse_command() {
+	//printf(">preparse: %s\n", rl_line_buffer);
+	std::stringstream ss(rl_line_buffer);
 	std::string word;
 	__command.clear();
-	while (ss >> word)
-		__command.push_back(word);
-	for(size_t i = 0; i < __command.size(); i ++)
-		printf("command part [%s]\n", __command[i].c_str());
-
-	if(__command.size() >= 1) {
-		bool command_started = false;
-		for(int i = 0; i < arr_size(d2d_cmd); i ++) {
-			if(__command[0] == std::string(d2d_cmd[i])) {
-				command_started = true;
-				printf("command started [%s]\n", d2d_cmd[i]);
+	while (ss >> word) {
+		bool is_correct_cmd = false;
+		switch(__command.size()) {
+			case 0:
+				is_correct_cmd = is_cmd(word, d2d_cmd, arr_size(d2d_cmd));
 				break;
-			}
+			case 1:
+				//is_correct_cmd = true;
+				is_correct_cmd = is_cmd(word, discovery_cmd, arr_size(discovery_cmd));
+				break;
+			default:
+				is_correct_cmd = true;
+				break;
 		}
-		if(!command_started)
-			__command.clear();
-	}*/
+		if(is_correct_cmd)
+			__command.push_back(word);
+		else
+			__command.push_back(__error_cmd);
 
-	/*const char** cmd_array = NULL;
-	int n = 0;
+	}
+	if((!__command.empty()) && (__command.back() == __error_cmd)) {
+		// We keep adding first word of the command:
+		// should ommit this part
+		__command.pop_back();
+	}
 
-	switch(__command.size()) {
-		case 0:
-			cmd_array = d2d_cmd;
-			n = arr_size(d2d_cmd);
-			break;
-		case 1:
-			if(__command[0] == "discovery") {
-				cmd_array = discovery_cmd;
-				n = arr_size(discovery_cmd);
-			} else if(__command[0] == "device") {
-				cmd_array = device_cmd;
-				n = arr_size(device_cmd);
-			} else if(__command[0] == "service") {
-				cmd_array = service_cmd;
-				n = arr_size(service_cmd);
-			} else if(__command[0] == "channel") {
-				// TODO
-			} else if(__command[0] == "payload") {
-				// TODO
-			} else {
-				// Unsupported state or 'quite'
-			}
-			break;
-		case 2:
-			if((__command[0] == "discovery") && (__command[1] == "start")) {
-				cmd_array = discovery_timeout_cmd;
-				n = arr_size(discovery_timeout_cmd);
-			} else if(__command[0] == "device") {
-				cmd_array = device_handle_cmd;
-				n = arr_size(device_handle_cmd);
-			} else if(__command[0] == "service") {
-				cmd_array = service_handle_cmd;
-				n = arr_size(service_handle_cmd);
-			} else if(__command[0] == "channel") {
-				// TODO
-			} else if(__command[0] == "payload") {
-				// TODO
-			} else {
-				// Unsupported state or 'quite'
-			}
-			break;
-			break;
-		default:
-			return ((char *)NULL);
-	}*/
+	//for(size_t i = 0; i < __command.size(); i ++)
+	//	printf("\n...[%s]\n", __command[i].c_str());
+}
 
+char* my_generator_table(const char* text, const char **table, int size, int *index, const char *tab_name) {
+	//printf(">my_generator_table %s: %s, %d\n", tab_name, text, *index);
+	const int len = strlen (text);
+	while (((*index) < size) && table[*index]) {
+		const char *name = table[*index];
+		(*index)++;
+		if (strncmp (name, text, len) == 0) {
+			//printf(">suggest: %s\n", name);
+			return (dupstr(name));
+		}
+	}
+
+	/* If no names matched, then return NULL. */
+	//printf(">my_generator_table: %s, %d HALTED\n", text, *index);
+	return ((char *)NULL);
+}
+
+// http://www.math.utah.edu/docs/info/rlman_2.html#SEC36
+char* my_generator(const char* text, int state)
+{
+	static int list_index = 0;
+
+	if (state == 0) { // First attempt to complete current word
+		list_index = 0;
+		pre_parse_command();
+	}
+
+	if (__command.empty()) { // The initial state: no command data entered
+		return my_generator_table(text, d2d_cmd, arr_size(d2d_cmd), &list_index, "d2d_cmd1");
+	} else if(__command.size() == 1) {
+		if(__command[0] == "discovery") {
+			//printf("yooooo\n");
+			return my_generator_table(text, discovery_cmd, arr_size(discovery_cmd), &list_index, "discovery_cmd");
+		}
+		if(__command[0] == "device")
+			return my_generator_table(text, device_cmd, arr_size(device_cmd), &list_index, "device_cmd");
+		if(__command[0] == "service")
+			return my_generator_table(text, service_cmd, arr_size(service_cmd), &list_index, "service_cmd");
+		else
+			return my_generator_table(text, d2d_cmd, arr_size(d2d_cmd), &list_index, "d2d_cmd2");
+	} else if(__command.size() == 2) {
+//for(size_t i = 0; i < __command.size(); i ++)
+//	printf("\n...{%s}\n", __command[i].c_str());
+		return my_generator_table(text, d2d_cmd, arr_size(d2d_cmd), &list_index, "d2d_cmd3");
+	} else {
+//for(size_t i = 0; i < __command.size(); i ++)
+//	printf("\n...{%s}\n", __command[i].c_str());
+		return my_generator_table(text, d2d_cmd, arr_size(d2d_cmd), &list_index, "d2d_cmd4");
+	}
+
+	return NULL;
+
+
+	#if 0
 	const char** cmd_array = d2d_cmd;
 	const int n = int(sizeof(d2d_cmd) / sizeof(d2d_cmd[0]));
 	while ((list_index < n) && cmd_array[list_index]) {
@@ -265,22 +287,19 @@ char* my_generator(const char* text, int state)
 
 	/* If no names matched, then return NULL. */
 	return ((char *)NULL);
+#endif
 
 }
 
-char * dupstr (const char* s) {
-	char *r;
-
-	r = (char*) xmalloc ((strlen (s) + 1));
-	strcpy (r, s);
-	return (r);
+char * dupstr(const char *s) {
+	char *r = (char *) xmalloc ((strlen (s) + 1));
+	strcpy(r, s);
+	return r;
 }
 
-void * xmalloc (int size)
+void *xmalloc(int size)
 {
-	void *buf;
-
-	buf = malloc (size);
+	void *buf = malloc(size);
 	if (!buf) {
 		fprintf (stderr, "Error: Out of memory. Exiting.'n");
 		exit (1);
