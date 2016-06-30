@@ -5,6 +5,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <unistd.h>
+
 #include <string>
 #include <vector>
 #include <sstream>
@@ -117,7 +119,17 @@ int main()
 {
 	printf("\n\n");
 	printf("D2D Convergence Console started\n");
-	printf("enter your commands...\n");
+	
+	const std::string trace = "Device-to-Device Convergence Manager Console "
+                 "Command Line Interface Application for testing Tiizen D2D Native API ";
+                                                                                                                
+         for(int i = 0; i < int(trace.length()); i ++) {                         
+                 printf("\r%s", trace.substr(i, 80).c_str());                    
+                 fflush(stdout);                                                                                
+                 usleep(1000 * 75);                                                                             
+         }
+         
+         printf("\nenter your commands...\n");
 
 	init_cmd_root();
 
