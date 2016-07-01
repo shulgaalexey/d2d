@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
 #include <unistd.h>
 
 #include <string>
@@ -12,12 +11,19 @@
 #include <sstream>
 #include <map>
 
-#define arr_size(a) (int(sizeof(a)/sizeof(a[0])))
+#include "d2d_conv_manager_fake.h"
+
 
 static char** my_completion(const char*, int ,int);
 char* my_generator(const char*,int);
 char * dupstr (const char*);
 void *xmalloc (int);
+static bool pre_parse_command(std::vector<std::string> *cmd, std::string *strange_word);
+
+static void process_discovery(const std::vector<std::string> &cmd);
+static void process_device(const std::vector<std::string> &cmd);
+static void process_service(const std::vector<std::string> &cmd);
+
 
 //-----------------------------------------------------------------------------
 
@@ -87,18 +93,21 @@ static void init_cmd_root() {
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("type"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("id"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("properties"));
+	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("create"));
+	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("destroy"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("connect"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("disconnect"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("start"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("stop"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("read"));
 	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("send"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("listen"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("stoplisten"));
+	// Always listening
+	//__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("listen"));
+	//__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("stoplisten"));
 
 	// Channel, Payload, Help, Quit
-	__cmd_root.add_child(new cmd_node("channel"));
-	__cmd_root.add_child(new cmd_node("payload"));
+	//__cmd_root.add_child(new cmd_node("channel"));
+	//__cmd_root.add_child(new cmd_node("payload"));
 	__cmd_root.add_child(new cmd_node("help"));
 	__cmd_root.add_child(new cmd_node("quit"));
 }
@@ -115,47 +124,181 @@ static std::string trim(const char *buf) {
 	return str;
 }
 
-int main()
-{
-	printf("\n\n");
-	printf("D2D Convergence Console started\n");
-	
-	const std::string trace = "Device-to-Device Convergence Manager Console "
-                 "Command Line Interface Application for testing Tiizen D2D Native API ";
-                                                                                                                
-         for(int i = 0; i < int(trace.length()); i ++) {                         
-                 printf("\r%s", trace.substr(i, 80).c_str());                    
-                 fflush(stdout);                                                                                
-                 usleep(1000 * 75);                                                                             
-         }
-         
-         printf("\nenter your commands...\n");
+static void show_intro() {
+	const unsigned int quick_pause = 30 * 1000; // ms
+	const unsigned int long_pause = 50 * 1000; // ms
 
+	printf("\n");
+
+	const std::string space = "                                           ";
+	const std::string trace = space + "Device-to-Device Convergence Manager Console "
+		"Command Line Interface Application for testing Tiizen D2D Native API ";
+
+	for(int i = 0; i < int(trace.length()); i ++) {
+		printf("\r%s", trace.substr(i, 60).c_str());
+		fflush(stdout);
+		usleep(long_pause);
+	}
+
+	printf("\r");
+	fflush(stdout);
+	usleep(long_pause);
+
+
+	const std::string title = "D2D Convergence Console\n";
+	for(size_t i = 0; i < title.length(); i ++) {
+		printf("%c", title[i]);
+		fflush(stdout);
+		usleep(quick_pause);
+	}
+
+	for(int i = 0; i < 34; i ++) {
+		printf("*");
+		fflush(stdout);
+		usleep(quick_pause);
+	}
+
+	printf("\n");
+
+	const std::string invite = "Enter your convergence commands...";
+	for(size_t i = 0; i < invite.length(); i ++) {
+		printf("%c", invite[i]);
+		fflush(stdout);
+		usleep(quick_pause);
+	}
+
+	printf("\n");
+}
+
+static void show_usage() {
+	printf("\n");
+	printf("D2D Convergence CLI 0.0.1\n\n");
+	printf("usage:\n");
+	printf(" help\n");
+	printf(" discovery start <timeout_seconds>                  - start or stop discovery\n");
+	printf(" device <handle> service | id | name | type         - get device services and properties\n");
+	printf(" service <handle> id | type | properties            - get service properties\n");
+	printf(" service create                                     - create local service\n");
+	printf(" service <handle> destroy                           - destroy local service\n");
+ // TODO: Consider accessing service as servicename@deviceName
+ // for example, App2App@TizenA
+	printf(" service <handle> connect | disconnect              - connect or disconnect service\n");
+	printf(" service <handle> start | stop [channel] [payload]  - start or stop service\n");
+	printf(" service <handle> send | read [channel] [payload]   - send or read data of service\n");
+	printf(" quit\n");
+}
+
+int main(int argc, char *argv[])
+{
+	// Analyze CLI app arguments
+	bool skip_dramatic_intro = false;
+	bool introduce_usage = false;
+	for(int i = 1; i < argc; i ++) {
+		if(std::string(argv[i]) == "-sdi")
+			skip_dramatic_intro = true;
+		if(std::string(argv[i]) == "-h")
+			introduce_usage = true;
+		else
+			printf("Unknown argument [%s]\n", argv[i]);
+	}
+
+	// Show (or not) the dramatic CLI intro
+	if(!skip_dramatic_intro)
+		show_intro();
+
+	if(introduce_usage)
+		show_usage();
+
+	// Initializa D2D CLI behavioral tree
 	init_cmd_root();
 
+	// Initialize auto-completion core
 	rl_attempted_completion_function = my_completion;
 
+	// Continuously process user input
 	char *buf = NULL;
 	while((buf = readline(" D2D >> ")) != NULL) {
+		const std::string origin_input = buf;
 		const std::string command = trim(buf);
 		free(buf);
 
-		if(command == "quit")
+		if(command.empty()) {
+			continue;
+		}
+
+		add_history(origin_input.c_str());
+
+		std::vector<std::string> cmd;
+		std::string strange_word;
+		if(!pre_parse_command(&cmd, &strange_word) || __error_cmd) {
+			if(!strange_word.empty())
+				printf("Incorrect command, strange word: %s\n",
+						strange_word.c_str());
+			else
+				printf("Incorrect command\n");
+			continue;
+		}
+
+		if(cmd.empty()) {
+			show_usage();
+			continue;
+		}
+
+		/*printf("  D2D << ");
+		for(size_t i = 0; i < cmd.size(); i ++)
+			printf("{%s} ", cmd[i].c_str());
+		printf("\n");*/
+
+		const std::string cmd_type = cmd[0];
+
+		// TODO: link functions to the nodes of behavioural graph
+		if(cmd_type == "quit")
 			break;
-		if(!command.empty())
-			add_history(command.c_str());
+		else if(cmd_type == "help")
+			show_usage();
+		else if(cmd_type == "discovery")
+			process_discovery(cmd);
+		else if(cmd_type == "device")
+			process_device(cmd);
+		else if(cmd_type == "service")
+			process_service(cmd);
+		else {
+			// VERY BAD: we shouldn't get there
+			// It indicates the error in pre_parse_command function
+			printf("Incorrect command\n");
+		}
 	}
 
 	return 0;
 }
 
+static void process_discovery(const std::vector<std::string> &cmd) {
+	printf("  BOOOM: process_discovery >> ");
+	for(size_t i = 0; i < cmd.size(); i ++)
+		printf("{%s} ", cmd[i].c_str());
+	printf("\n");
+}
+
+static void process_device(const std::vector<std::string> &cmd) {
+	printf("  BOOOM: process_device >> ");
+	for(size_t i = 0; i < cmd.size(); i ++)
+		printf("{%s} ", cmd[i].c_str());
+	printf("\n");
+}
+
+static void process_service(const std::vector<std::string> &cmd) {
+	printf("  BOOOM: process_service >> ");
+	for(size_t i = 0; i < cmd.size(); i ++)
+		printf("{%s} ", cmd[i].c_str());
+	printf("\n");
+}
 
 static char** my_completion( const char *text , int start,  int end)
 {
 	return rl_completion_matches ((char*)text, &my_generator);
 }
 
-bool pre_parse_command() {
+static bool pre_parse_command(std::vector<std::string> *cmd, std::string *strange_word) {
 
 	// Start command parsing from the beginning of the line
 	__selected_cmd = &__cmd_root;
@@ -177,11 +320,16 @@ bool pre_parse_command() {
 			// OK: have a part of the command
 			__selected_cmd = __selected_cmd->children[word];
 
+			if(cmd)
+				cmd->push_back(__selected_cmd->name);
+
 		} else {
 			// Something strange is happening
 			// If it is a final word, than the user might keep typing
 			// If it is in the middle of the sentence, than it is an incorrect command
 			__error_cmd = true;
+			if(strange_word)
+				*strange_word = word;
 		}
 	}
 	return true;
@@ -193,7 +341,7 @@ char* my_generator(const char* text, int state)
 	static std::map<std::string, cmd_node *>::iterator it = __selected_cmd->children.begin();
 
 	if (state == 0) { // First attempt to complete current word
-		if(!pre_parse_command()) {
+		if(!pre_parse_command(NULL, NULL)) {
 			return NULL;
 		}
 		it = __selected_cmd->children.begin();
