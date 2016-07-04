@@ -13,10 +13,12 @@ g++ -Wall -g -o test `pkg-config --cflags glib-2.0` d2d.cpp d2d_conv_manager_fak
 Run
 ---
 
+```
 ./d2d 
+```
 
 ###use flags
 
- -h   to print help
+ **-h**   to print help
  
- -sdi to scip dramatic intro
+ **-sdi** to scip dramatic intro
