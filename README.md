@@ -15,6 +15,8 @@ Run
 
 ./d2d 
 
-use flags
+###use flags
+
  -h   to print help
+ 
  -sdi to scip dramatic intro
