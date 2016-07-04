@@ -1,5 +1,9 @@
 // http://www.math.utah.edu/docs/info/rlman_2.html#SEC36
 // http://cc.byexamples.com/2008/06/16/gnu-readline-implement-custom-auto-complete/
+
+#include "d2d_conv_manager_fake.h"
+#include "scope_logger.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
@@ -11,7 +15,6 @@
 #include <sstream>
 #include <map>
 
-#include "d2d_conv_manager_fake.h"
 
 
 static char** my_completion(const char*, int ,int);
@@ -25,6 +28,7 @@ static void process_device(const std::vector<std::string> &cmd);
 static void process_service(const std::vector<std::string> &cmd);
 
 static conv_h __convergence_manager = NULL;
+static std::vector<conv_device_h> __devices;
 
 
 //-----------------------------------------------------------------------------
@@ -70,6 +74,8 @@ void cmd_node::trace() {
 
 cmd_node __cmd_root("D2D");
 cmd_node *__selected_cmd = &__cmd_root;
+cmd_node *__device_handle_cmd = NULL;
+cmd_node *__service_handle_cmd = NULL;
 bool __error_cmd = false;
 
 static void init_cmd_root() {
@@ -83,29 +89,31 @@ static void init_cmd_root() {
 
 	// Device
 	__cmd_root.add_child(new cmd_node("device"));
-	__cmd_root.children["device"]->add_child(new cmd_node("dhandle"));
-	__cmd_root.children["device"]->children["dhandle"]->add_child(new cmd_node("services"));
-	__cmd_root.children["device"]->children["dhandle"]->add_child(new cmd_node("id"));
-	__cmd_root.children["device"]->children["dhandle"]->add_child(new cmd_node("name"));
-	__cmd_root.children["device"]->children["dhandle"]->add_child(new cmd_node("type"));
+	__cmd_root.children["device"]->add_child(new cmd_node("<dhandle>"));
+	__device_handle_cmd = __cmd_root.children["device"]->children["<dhandle>"]; // Pointer on device handle part of command
+	__cmd_root.children["device"]->children["<dhandle>"]->add_child(new cmd_node("services"));
+	__cmd_root.children["device"]->children["<dhandle>"]->add_child(new cmd_node("id"));
+	__cmd_root.children["device"]->children["<dhandle>"]->add_child(new cmd_node("name"));
+	__cmd_root.children["device"]->children["<dhandle>"]->add_child(new cmd_node("type"));
 
 	// Service
 	__cmd_root.add_child(new cmd_node("service"));
-	__cmd_root.children["service"]->add_child(new cmd_node("shandle"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("type"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("id"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("properties"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("create"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("destroy"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("connect"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("disconnect"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("start"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("stop"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("read"));
-	__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("send"));
+	__cmd_root.children["service"]->add_child(new cmd_node("<shandle>"));
+	__device_handle_cmd = __cmd_root.children["service"]->children["<shandle>"]; // Pointer on service handle part of command
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("type"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("id"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("properties"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("create"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("destroy"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("connect"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("disconnect"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("start"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("stop"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("read"));
+	__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("send"));
 	// Always listening
-	//__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("listen"));
-	//__cmd_root.children["service"]->children["shandle"]->add_child(new cmd_node("stoplisten"));
+	//__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("listen"));
+	//__cmd_root.children["service"]->children["<shandle>"]->add_child(new cmd_node("stoplisten"));
 
 	// Channel, Payload, Help, Quit
 	//__cmd_root.add_child(new cmd_node("channel"));
@@ -114,6 +122,18 @@ static void init_cmd_root() {
 	__cmd_root.add_child(new cmd_node("quit"));
 }
 
+static void __reset_cmd_device_handles() {
+
+	std::map<std::string, cmd_node *> &dhandles =
+		__cmd_root.children["device"]->children;
+
+	for(std::map<std::string, cmd_node *>::iterator it = dhandles.begin();
+			it != dhandles.end(); ++it) {
+		if(it->first != "<dhandle>") {
+			dhandles.erase(it);
+		}
+	}
+}
 //-----------------------------------------------------------------------------
 
 
@@ -246,6 +266,7 @@ class ConsoleColorSetter {
 
 // TODO disable file browsing for autocompletion
 
+
 int main(int argc, char *argv[])
 {
 	ConsoleColorSetter ccs;
@@ -315,9 +336,10 @@ int main(int argc, char *argv[])
 		const std::string cmd_type = cmd[0];
 
 		// TODO: link functions to the nodes of behavioural graph
-		if(cmd_type == "quit")
+		if(cmd_type == "quit") {
+			__reset_cmd_device_handles();
 			break;
-		else if(cmd_type == "help")
+		} else if(cmd_type == "help")
 			show_usage();
 		else if(cmd_type == "discovery")
 			process_discovery(cmd);
@@ -341,6 +363,66 @@ int main(int argc, char *argv[])
 
 static void __conv_discovery_cb(conv_device_h device_handle,
 		conv_discovery_result_e result, void* user_data) {
+	ScopeLogger();
+
+	switch(result) {
+		case CONV_DISCOVERY_RESULT_SUCCESS: {
+			// Stor discovered device in the global storage
+			__devices.push_back(device_handle);
+
+			// Get general device parameters
+			char *id = NULL;
+			conv_device_get_property_string(device_handle, CONV_DEVICE_ID, &id);
+
+			char *name = NULL;
+			conv_device_get_property_string(device_handle, CONV_DEVICE_NAME, &name);
+
+			char *type = NULL;
+			conv_device_get_property_string(device_handle, CONV_DEVICE_TYPE, &type);
+
+			// Print device info on console
+			printf("\nFound device   %s   handle: %p   type: %s   id: %s\n",
+				name, device_handle, type, id);
+
+			// Add new device name to the behavioral tree
+			if(name) {
+				__cmd_root.children["device"]->add_child(new cmd_node(name));
+				__cmd_root.children["device"]->children[name]->children =
+					__cmd_root.children["device"]->children["<dhandle>"]->children;
+
+				std::stringstream ss;
+				ss << ((void *)device_handle);
+				const std::string handle_str = ss.str();
+				__cmd_root.children["device"]->add_child(new cmd_node(handle_str));
+				__cmd_root.children["device"]->children[handle_str]->children =
+					__cmd_root.children["device"]->children["<dhandle>"]->children;
+
+			}
+
+			if(id)
+				free(id);
+			if(name)
+				free(name);
+			if(type)
+				free(type);
+			break;
+		}
+		case CONV_DISCOVERY_RESULT_FINISHED:
+			printf("Discovery finished\n");
+			break;
+		case CONV_DISCOVERY_RESULT_ERROR:
+			printf("Discovery error\n");
+			break;
+		case CONV_DISCOVERY_RESULT_LOST:
+			printf("Discovery lost\n");
+			break;
+		default:
+			_E("Unknown discovery status");
+			break;
+	}
+
+	printf(" D2D >> ");
+	fflush(stdout);
 }
 
 // commands:
@@ -358,6 +440,13 @@ static void process_discovery(const std::vector<std::string> &cmd) {
 	}
 
 	if(cmd[1] == "start") {
+
+		// Reset device list
+		__devices.clear();
+
+		// Reset behaviour tree
+		__reset_cmd_device_handles();
+
 		int timeout_seconds = 0; // default value
 
 		if(cmd.size() > 2)
@@ -407,11 +496,29 @@ static void __conv_service_foreach_cb(conv_service_h service_handle,
 	}
 }
 
+// Accepting handles of types <device_handle_ptr>
 conv_device_h get_device_handle_by_handle_string(const std::string &handle_str) {
+	for(size_t i = 0; i < __devices.size(); i ++) {
+		std::stringstream ss;
+		ss << ((void *)__devices[i]);
+		if(handle_str == ss.str())
+			return __devices[i];
+	}
 	return NULL;
 }
 
 conv_device_h get_device_handle_by_name(const std::string &name) {
+	for(size_t i = 0; i < __devices.size(); i ++) {
+		char *cur_name = NULL;
+		conv_device_get_property_string(__devices[i], CONV_DEVICE_NAME, &cur_name);
+		if(cur_name && name == cur_name) {
+			free(cur_name);
+			return __devices[i];
+		}
+
+		if(cur_name)
+			free(cur_name);
+	}
 	return NULL;
 }
 
@@ -421,10 +528,10 @@ conv_device_h get_device_handle_by_name(const std::string &name) {
 // device <dhandle1 | TizenA> name
 // device <dhandle1 | TizenA> type
 static void process_device(const std::vector<std::string> &cmd) {
-	printf("  BOOOM: process_device >> ");
+	/*printf("  BOOOM: process_device >> ");
 	for(size_t i = 0; i < cmd.size(); i ++)
 		printf("{%s} ", cmd[i].c_str());
-	printf("\n");
+	printf("\n");*/
 
 
 	if(cmd.size() != 3) {
@@ -537,12 +644,18 @@ char* my_generator(const char* text, int state)
 			return NULL;
 		}
 		it = __selected_cmd->children.begin();
+
+		if((__selected_cmd == __device_handle_cmd) || (__selected_cmd == __service_handle_cmd)) {
+			if(__selected_cmd->children.size() > 1)
+				++it; // First item is a prototype
+		}
 	}
 
 	if(__selected_cmd->children.empty()) {
 		// This is the lates component of the command
 		return NULL;
 	}
+
 
 	const int len = strlen (text);
 	while(it != __selected_cmd->children.end()) {
