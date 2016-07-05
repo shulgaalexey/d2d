@@ -7,7 +7,7 @@ Build
 -----
 
 ```
-g++ -Wall -g -o test `pkg-config --cflags glib-2.0` d2d.cpp d2d_conv_manager_fake.cpp techno_service.cpp `pkg-config --libs glib-2.0` -lpthread -lreadline
+g++ -Wall -g -o d2d `pkg-config --cflags glib-2.0` d2d.cpp d2d_conv_manager_fake.cpp techno_service.cpp `pkg-config --libs glib-2.0` -lpthread -lreadline
 ```
 
 Run
