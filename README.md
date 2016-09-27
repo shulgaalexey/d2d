@@ -12,7 +12,7 @@ The terminal of Tizen D2D Convergence Manager
 ## How to Build
 You can build with following command for armv7l target board.
 
-<code>$ gbs build -A armv7l --include-all --keep-packs/code>
+<code>$ gbs build -A armv7l --include-all --keep-packs</code>
 
 ## How to Check Log
 You can determine the way to make logs by setting configurations on 'server/include/common.h'.
