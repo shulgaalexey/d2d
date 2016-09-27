@@ -14,6 +14,7 @@ BuildRequires:  cmake
 BuildRequires:  libattr-devel
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(dlog)
+BuildRequires:  pkgconfig(d2d-conv-manager)
 
 ## Description string that this package's human users can understand
 %description

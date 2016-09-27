@@ -3,9 +3,12 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "common.h"
 #include <dlog.h>
 #include <glib.h>
+
+#include "common.h"
+
+#include <d2d_conv_manager.h>
 
 #undef LOG_TAG
 #define LOG_TAG "D2D_CONV_CONSOLE"

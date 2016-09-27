@@ -7,6 +7,7 @@ project(d2d-conv-console-svc CXX)
 INCLUDE(FindPkgConfig)
 PKG_CHECK_MODULES(rpkgs-dlog REQUIRED dlog)
 PKG_CHECK_MODULES(rpkgs-glib REQUIRED glib-2.0)
+PKG_CHECK_MODULES(rpkgs-glib REQUIRED d2d-conv-manager)
 
 # Add CFLAGS used for required modules
 ADD_DEFINITIONS(${rpkgs-dlog_CFLAGS})
