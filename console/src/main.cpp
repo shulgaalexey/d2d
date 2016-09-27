@@ -26,8 +26,6 @@ gboolean timeout_func_cb(gpointer data)
 
 int main(int argc, char *argv[])
 {
-	int error, ret = 0;
-
 	// Initialize a GTK main loop
 	gMainLoop = g_main_loop_new(NULL, FALSE);
 	ERR("D2D Convergence Console Sevice started\n");
@@ -42,7 +40,7 @@ int main(int argc, char *argv[])
 	ERR("D2D Convergence Console Serice is terminated successfully\n");
 	printf("D2D Convergence Console Serice is terminated successfully\n");
 
-	return ret;
+	return 0;
 }
 
 //! End of a file
