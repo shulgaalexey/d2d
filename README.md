@@ -21,5 +21,5 @@ You can determine the way to make logs by setting configurations on 'server/incl
 1. USE_SYSLOG_DEBUG: You can check logs by reading '/var/log/messages'
 1. USE_FILE_DEBUG: You can check logs by reading '/var/log/messages'
 
-
+## Basics
 Many thanks to https://github.com/SKKU-ESLAB-Tizen/hello-tizen-service
