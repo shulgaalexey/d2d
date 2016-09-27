@@ -8,6 +8,7 @@
 #define __SCOPE_LOGGER_MUTE
 #endif
 
+// TODO use common logger settings
 class ScopeLogger {
 	private:
 		const std::string _file;

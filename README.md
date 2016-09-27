@@ -1,30 +1,25 @@
-# d2d
+# d2d convergence console
 Command line interface for d2d convergence
 ==========================================
 
+The terminal of Tizen D2D Convergence Manager
 
-Build
------
+## Prerequisites
 
-```
-g++ -Wall -g -o d2d `pkg-config --cflags glib-2.0` d2d.cpp d2d_conv_manager_fake.cpp techno_service.cpp `pkg-config --libs glib-2.0` -lpthread -lreadline
-```
+1. GBS configuration (~/.gbs.conf)
+1. Installation of GBS
 
-or
+## How to Build
+You can build with following command for armv7l target board.
 
-```
-g++ -Wall -g -o d2d `pkg-config --cflags glib-2.0` d2d_tizen.cpp d2d_conv_manager_fake.cpp techno_service.cpp  -lpthread
-```
+<code>$ gbs build -A armv7l --include-all --keep-packs/code>
 
-Run
----
+## How to Check Log
+You can determine the way to make logs by setting configurations on 'server/include/common.h'.
 
-```
-./d2d
-```
+1. USE_DLOG_DEBUG: You can check logs by running 'dlogutil'
+1. USE_SYSLOG_DEBUG: You can check logs by reading '/var/log/messages'
+1. USE_FILE_DEBUG: You can check logs by reading '/var/log/messages'
 
-###use flags (not in simplified version)
 
- **-h**   to print help
-
- **-sdi** to scip dramatic intro
+Many thanks to https://github.com/SKKU-ESLAB-Tizen/hello-tizen-service

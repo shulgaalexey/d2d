@@ -2,7 +2,6 @@
 #define __CONV_TECHNO_SERVICE_H__
 
 #include <glib.h>
-//#include </usr/include/glib-2.0/glib.h>
 #include <string>
 #include <vector>
 #include "d2d_conv_manager_fake.h"

@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the D2D Convergence Console service
+After=bluetooth.service
+
+[Service]
+ExecStart=/usr/bin/d2d-conv-console-svc
+Type=oneshot
+
+[Install]
+WantedBy=graphical.target
