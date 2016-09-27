@@ -23,6 +23,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${PROJECT_NAME}
 	src/common.cpp
 	src/main.cpp
+	src/d2d_conv_console.cpp
 )
 
 # Set LDFLAGS

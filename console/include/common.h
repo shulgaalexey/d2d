@@ -1,5 +1,5 @@
-#if !defined(_COMMON_H_)
-#define _COMMON_H_
+#if !defined(_D2D_CONV_CONSOLE_COMMON_H_)
+#define _D2D_CONV_CONSOLE_COMMON_H_
 
 // Log methods
 // USE_DLOG_DEBUG: You can check logs by running 'dlogutil'
@@ -39,7 +39,7 @@ void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
 #ifdef LOG_TAG
 	#undef LOG_TAG
 #endif
-#define LOG_TAG	"D2D_TIZEN_SVC"
+#define LOG_TAG "D2D_CONV_CONSOLE"
 //
 
 
