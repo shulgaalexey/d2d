@@ -1,5 +1,7 @@
 #include "d2d_conv_console.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
 #include "common.h"
 #include "scope_logger.h"
 
@@ -85,35 +87,95 @@ int d2d_conv_console::process(std::vector<std::string> &cmd) {
 // discovery start 15
 // discovery stop
 int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
-	return CONV_ERROR_NONE;
-	/*if(cmd.size() < 1) {
-		printf("Incorrect format of discovery command: no start or stop instruction\n");
-		return;
+	ScopeLogger();
+	if(cmd.size() < 1) {
+		printf("Incorrect format of discovery command: "
+				"no start or stop instruction\n");
+		return INCORRECT_COMMAND;
 	}
 
 	if(cmd[1] == "start") {
 
 		// Reset device list
-		__devices.clear();
+		devices.clear();
 
 		int timeout_seconds = 0; // default value
 
 		if(cmd.size() > 2)
 			timeout_seconds = atoi(cmd[2].c_str());
 
-		const int error = conv_discovery_start(__convergence_manager,
-				timeout_seconds, __conv_discovery_cb, NULL);
+		const int error = conv_discovery_start(convergence_manager,
+				timeout_seconds, __conv_discovery_cb, this);
 		print_conv_error(error);
+		return error;
 	} else if(cmd[1] == "stop") {
-		const int error = conv_discovery_stop(__convergence_manager);
+		const int error = conv_discovery_stop(convergence_manager);
 		print_conv_error(error);
+		return error;
 	} else {
 		printf("Incorrect instruction of discovery\n");
-	}*/
+		return INCORRECT_COMMAND;
+	}
+	return CONV_ERROR_NONE;
 }
 
-/*static void __conv_service_foreach_cb(conv_service_h service_handle,
-		void* user_data) {
+void d2d_conv_console::__conv_discovery_cb(conv_device_h device_handle,
+		conv_discovery_result_e result, void* user_data) {
+	ScopeLogger();
+
+
+	switch(result) {
+	case CONV_DISCOVERY_RESULT_SUCCESS: {
+
+		// Get general device parameters
+		char *id = NULL;
+		conv_device_get_property_string(device_handle,
+				CONV_DEVICE_ID, &id);
+
+		char *name = NULL;
+		conv_device_get_property_string(device_handle,
+				CONV_DEVICE_NAME, &name);
+
+		char *type = NULL;
+		conv_device_get_property_string(device_handle,
+				CONV_DEVICE_TYPE, &type);
+
+		// Print device info on console
+		printf("\nFound device   %s   handle: %p   type: %s   id: %s\n",
+				name, device_handle, type, id);
+
+		// Store discovered device in the global storage
+		d2d_conv_console *owner = (d2d_conv_console *)user_data;
+		if(owner)
+			owner->devices.push_back(device_handle);
+
+		if(id)
+			free(id);
+		if(name)
+			free(name);
+		if(type)
+			free(type);
+		break;
+	}
+	case CONV_DISCOVERY_RESULT_FINISHED:
+		printf("Discovery finished\n");
+		break;
+	case CONV_DISCOVERY_RESULT_ERROR:
+		printf("Discovery error\n");
+		break;
+	case CONV_DISCOVERY_RESULT_LOST:
+		printf("Discovery lost\n");
+		break;
+	default:
+		ERR("Unknown discovery status");
+		break;
+	}
+}
+
+
+void d2d_conv_console::__conv_service_foreach_cb(
+		conv_service_h service_handle, void* user_data) {
+	ScopeLogger();
 	if(!service_handle)
 		return;
 	printf("handle: 0x%p", (void *)service_handle);
@@ -143,35 +205,38 @@ int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
 			printf("   version: NULL");
 		}
 	}
-	printf("\n D2D >> ");
-	fflush(stdout);
 }
 
 // Accepting handles of types <device_handle_ptr>
-conv_device_h get_device_handle_by_handle_string(const std::string &handle_str) {
-	for(size_t i = 0; i < __devices.size(); i ++) {
+conv_device_h d2d_conv_console::get_device_handle_by_handle_string(
+		const std::string &handle_str) const {
+	ScopeLogger();
+	for(size_t i = 0; i < devices.size(); i ++) {
 		std::stringstream ss;
-		ss << ((void *)__devices[i]);
+		ss << ((void *)devices[i]);
 		if(handle_str == ss.str())
-			return __devices[i];
+			return devices[i];
 	}
 	return NULL;
 }
 
-conv_device_h get_device_handle_by_name(const std::string &name) {
-	for(size_t i = 0; i < __devices.size(); i ++) {
+conv_device_h d2d_conv_console::get_device_handle_by_name(
+		const std::string &name) const {
+	ScopeLogger();
+	for(size_t i = 0; i < devices.size(); i ++) {
 		char *cur_name = NULL;
-		conv_device_get_property_string(__devices[i], CONV_DEVICE_NAME, &cur_name);
+		conv_device_get_property_string(devices[i],
+				CONV_DEVICE_NAME, &cur_name);
 		if(cur_name && name == cur_name) {
 			free(cur_name);
-			return __devices[i];
+			return devices[i];
 		}
 
 		if(cur_name)
 			free(cur_name);
 	}
 	return NULL;
-}*/
+}
 
 // commands:
 // device <dhandle1 | TizenA> services
@@ -179,16 +244,10 @@ conv_device_h get_device_handle_by_name(const std::string &name) {
 // device <dhandle1 | TizenA> name
 // device <dhandle1 | TizenA> type
 int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
-	return CONV_ERROR_NONE;
-	/*printf("  BOOOM: process_device >> ");
-	for(size_t i = 0; i < cmd.size(); i ++)
-		printf("{%s} ", cmd[i].c_str());
-	printf("\n");*/
-
-/*
 	if(cmd.size() != 3) {
-		printf("Incorrect format of discovery command: no start or stop instruction\n");
-		return;
+		printf("Incorrect format of discovery command: "
+				"no start or stop instruction\n");
+		return INCORRECT_COMMAND;
 	}
 
 	// Assuming the device is specified with handle
@@ -199,7 +258,7 @@ int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 
 	if(!device) {
 		printf("Incorrect handle or name of the device\n");
-		return; // No device handle, can not continue
+		return INCORRECT_COMMAND; // No device handle, can not continue
 	}
 
 	if(cmd[2] == "services") {
@@ -233,15 +292,16 @@ int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 			printf("%s\n", type);
 			free(type);
 		}
-	}*/
+	}
+	return CONV_ERROR_NONE;
 }
 
 int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 	return CONV_ERROR_NONE;
 	/*printf("  BOOOM: process_service >> ");
-	for(size_t i = 0; i < cmd.size(); i ++)
-		printf("{%s} ", cmd[i].c_str());
-	printf("\n");*/
+	  for(size_t i = 0; i < cmd.size(); i ++)
+	  printf("{%s} ", cmd[i].c_str());
+	  printf("\n");*/
 }
 
 
@@ -337,53 +397,6 @@ int main(int argc, char *argv[])
 	print_conv_error(error);
 
 	return 0;
-}
-
-static void __conv_discovery_cb(conv_device_h device_handle,
-		conv_discovery_result_e result, void* user_data) {
-	ScopeLogger();
-
-	switch(result) {
-		case CONV_DISCOVERY_RESULT_SUCCESS: {
-
-			// Get general device parameters
-			char *id = NULL;
-			conv_device_get_property_string(device_handle, CONV_DEVICE_ID, &id);
-
-			char *name = NULL;
-			conv_device_get_property_string(device_handle, CONV_DEVICE_NAME, &name);
-
-			char *type = NULL;
-			conv_device_get_property_string(device_handle, CONV_DEVICE_TYPE, &type);
-
-			// Print device info on console
-			printf("\nFound device   %s   handle: %p   type: %s   id: %s\n",
-				name, device_handle, type, id);
-
-			// Store discovered device in the global storage
-			__devices.push_back(device_handle);
-
-			if(id)
-				free(id);
-			if(name)
-				free(name);
-			if(type)
-				free(type);
-			break;
-		}
-		case CONV_DISCOVERY_RESULT_FINISHED:
-			printf("Discovery finished\n");
-			break;
-		case CONV_DISCOVERY_RESULT_ERROR:
-			printf("Discovery error\n");
-			break;
-		case CONV_DISCOVERY_RESULT_LOST:
-			printf("Discovery lost\n");
-			break;
-		default:
-			_E("Unknown discovery status");
-			break;
-	}
 }
 
 

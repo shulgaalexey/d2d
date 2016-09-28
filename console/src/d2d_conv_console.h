@@ -20,6 +20,17 @@ class d2d_conv_console {
 		int process_discovery(const std::vector<std::string> &cmd);
 		int process_device(const std::vector<std::string> &cmd);
 		int process_service(const std::vector<std::string> &cmd);
+
+
+		conv_device_h get_device_handle_by_handle_string(
+				const std::string &handle_str) const;
+		conv_device_h get_device_handle_by_name(
+				const std::string &name) const;
+
+		static void __conv_discovery_cb(conv_device_h device_handle,
+				conv_discovery_result_e result, void* user_data);
+		static void __conv_service_foreach_cb(
+				conv_service_h service_handle, void* user_data);
 	public:
 		static const int INCORRECT_COMMAND = CONV_ERROR_NO_DATA + 1000;
 	private:
