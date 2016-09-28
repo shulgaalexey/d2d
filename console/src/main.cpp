@@ -24,7 +24,7 @@ static std::string trim(const std::string &input) {
 
 static void show_usage() {
 	printf("\n");
-	printf("D2D Convergence CLI 0.0.1\n\n");
+	printf("D2D Convergence Console 0.0.1\n\n");
 	printf("usage:\n");
 	printf(" help                                               - print instructions\n");
 	printf(" discovery start <timeout_seconds>                  - start or stop discovery\n");
@@ -47,6 +47,14 @@ static void tokenize_command(const std::string &input, std::vector<std::string> 
 	while (ss >> word) {
 		cmd->push_back(word);
 	}
+}
+
+static bool command_quit(const std::vector<std::string> &cmd) {
+	return ((cmd.size() > 0) && (cmd[0] == "quit"));
+}
+
+static bool command_help(const std::vector<std::string> &cmd) {
+	return ((cmd.size() > 0) && (cmd[0] == "help"));
 }
 
 #if 0
@@ -103,13 +111,18 @@ int main(int argc, char *argv[])
 		std::vector<std::string> cmd;
 		tokenize_command(command, &cmd);
 
-		if(cmd.empty()) {
+		if(command_help(cmd)) {
 			show_usage();
 			continue;
 		}
 
+		if(command_quit(cmd))
+			break;
+
 		// Process the command
-		cc.process(cmd);
+		if(cc.process(cmd) == d2d_conv_console::INCORRECT_COMMAND)
+			show_usage(); // Detected a command instruction
+
 	}
 
 	// Destroy convergence manager

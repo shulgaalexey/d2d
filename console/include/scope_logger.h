@@ -3,12 +3,14 @@
 
 #include <stdio.h>
 #include <string>
+#include "common.h"
 
 #ifndef __SCOPE_LOGGER_MUTE
 #define __SCOPE_LOGGER_MUTE
 #endif
 
 // TODO use common logger settings
+// TODO move this class to common.h
 class ScopeLogger {
 	private:
 		const std::string _file;
@@ -22,37 +24,44 @@ class ScopeLogger {
 			#ifdef __SCOPE_LOGGER_MUTE
 				return;
 			#endif
-			printf("%c[%d;%dm", 0x1B, 0, 34);
+			/*printf("%c[%d;%dm", 0x1B, 0, 34);
 			printf("SCOPE %s:%d entered %s\n",
 					_file.c_str(), _line, _function.c_str());
-			printf("%c[%d;%dm", 0x1B, 0, 32);
+			printf("%c[%d;%dm", 0x1B, 0, 32);*/
+			DBG("SCOPE %s:%d entered %s",
+					_file.c_str(), _line, _function.c_str());
 		}
 		~ScopeLogger() {
 			#ifdef __SCOPE_LOGGER_MUTE
 				return;
 			#endif
-			printf("%c[%d;%dm", 0x1B, 0, 34);
+			/*printf("%c[%d;%dm", 0x1B, 0, 34);
 			printf("SCOPE %s:%d exited %s\n",
 					_file.c_str(), _line, _function.c_str());
-			printf("%c[%d;%dm", 0x1B, 0, 32);
+			printf("%c[%d;%dm", 0x1B, 0, 32);*/
+			DBG("SCOPE %s:%d exited %s",
+					_file.c_str(), _line, _function.c_str());
 		}
 
 	public:
+		// TODO remove following two static members
 		static void debug(const std::string &str) {
 			#ifdef __SCOPE_LOGGER_MUTE
 				return;
 			#endif
-			printf("%c[%d;%dm", 0x1B, 0, 34);
+			/*printf("%c[%d;%dm", 0x1B, 0, 34);
 			printf("D: %s\n", str.c_str());
-			printf("%c[%d;%dm", 0x1B, 0, 32);
+			printf("%c[%d;%dm", 0x1B, 0, 32);*/
+			DBG("D: %s", str.c_str());
 		}
 		static void error(const std::string &str) {
 			#ifdef __SCOPE_LOGGER_MUTE
 				return;
 			#endif
-			printf("%c[%d;%dm", 0x1B, 0, 31);
-			printf("D: %s\n", str.c_str());
-			printf("%c[%d;%dm", 0x1B, 0, 32);
+			/*printf("%c[%d;%dm", 0x1B, 0, 31);
+			printf("E: %s\n", str.c_str());
+			printf("%c[%d;%dm", 0x1B, 0, 32);*/
+			ERR("E: %s", str.c_str());
 		}
 };
 
