@@ -4,6 +4,25 @@ Command line interface for d2d convergence
 
 The terminal of Tizen D2D Convergence Manager
 
+## Commands
+
+help                                               - print instructions
+  
+discovery start <timeout_seconds>                  - start or stop discovery
+	
+device <handle> service | id | name | type         - get device services and properties
+	
+service <handle> id | type | properties            - get service properties
+service create                                     - create local service
+service <handle> destroy                           - destroy local service
+
+service <handle> connect | disconnect              - connect or disconnect service
+service <handle> start | stop [channel] [payload]  - start or stop service
+service <handle> send | read [channel] [payload]   - send or read data of service
+	
+quit                                               - quit the console
+
+
 ## Prerequisites
 
 1. GBS configuration (~/.gbs.conf)
