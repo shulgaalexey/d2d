@@ -6,7 +6,7 @@ The terminal of Tizen D2D Convergence Manager
 
 ## Commands
 
-<code>
+```
 help                                               - print instructions
 
 discovery start <timeout_seconds>                  - start or stop discovery
@@ -22,7 +22,7 @@ service <handle> start | stop [channel] [payload]  - start or stop service
 service <handle> send | read [channel] [payload]   - send or read data of service
 
 quit                                               - quit the console
-</code>
+```
 
 ## Prerequisites
 
