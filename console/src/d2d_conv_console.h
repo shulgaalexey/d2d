@@ -48,7 +48,7 @@ class d2d_conv_console {
 				const std::string &handle_str) const;
 
 		static void __conv_discovery_cb(conv_device_h device_handle,
-				conv_discovery_result_e result, void* user_data);
+			conv_discovery_result_e result, void* user_data);
 		static void __conv_service_foreach_cb(
 				conv_service_h service_handle, void* user_data);
 	public:

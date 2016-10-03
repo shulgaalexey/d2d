@@ -62,16 +62,16 @@ int d2d_conv_console::stop() {
 int d2d_conv_console::process(std::vector<std::string> &cmd) {
 	ScopeLogger();
 
-	if(cmd.size() < 1) return INCORRECT_COMMAND;
+	if (cmd.size() < 1) return INCORRECT_COMMAND;
 
 	const std::string cmd_type = cmd[0];
 
 	// Initial dispatching: which part of API is required
-	if(cmd_type == "discovery")
+	if (cmd_type == "discovery")
 		return process_discovery(cmd);
-	else if(cmd_type == "device")
+	else if (cmd_type == "device")
 		return process_device(cmd);
-	else if(cmd_type == "service")
+	else if (cmd_type == "service")
 		return process_service(cmd);
 	else {
 		// VERY BAD: we shouldn't get there
@@ -88,27 +88,27 @@ int d2d_conv_console::process(std::vector<std::string> &cmd) {
 // discovery stop
 int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	if(cmd.size() < 1) {
+	if (cmd.size() < 1) {
 		printf("Incorrect format of discovery command: "
 				"no start or stop instruction\n");
 		return INCORRECT_COMMAND;
 	}
 
-	if(cmd[1] == "start") {
+	if (cmd[1] == "start") {
 
 		// Reset device list
 		devices.clear();
 
 		int timeout_seconds = 0; // default value
 
-		if(cmd.size() > 2)
+		if (cmd.size() > 2)
 			timeout_seconds = atoi(cmd[2].c_str());
 
 		const int error = conv_discovery_start(convergence_manager,
 				timeout_seconds, __conv_discovery_cb, this);
 		print_conv_error(error);
 		return error;
-	} else if(cmd[1] == "stop") {
+	} else if (cmd[1] == "stop") {
 		const int error = conv_discovery_stop(convergence_manager);
 		print_conv_error(error);
 		return error;
@@ -146,14 +146,14 @@ void d2d_conv_console::__conv_discovery_cb(conv_device_h device_handle,
 
 		// Store discovered device in the global storage
 		d2d_conv_console *owner = (d2d_conv_console *)user_data;
-		if(owner)
+		if (owner)
 			owner->devices.push_back(device_handle);
 
-		if(id)
+		if (id)
 			free(id);
-		if(name)
+		if (name)
 			free(name);
-		if(type)
+		if (type)
 			free(type);
 		break;
 	}
@@ -176,7 +176,7 @@ void d2d_conv_console::__conv_discovery_cb(conv_device_h device_handle,
 void d2d_conv_console::__conv_service_foreach_cb(
 		conv_service_h service_handle, void* user_data) {
 	ScopeLogger();
-	if(!service_handle)
+	if (!service_handle)
 		return;
 	printf("handle: 0x%p", (void *)service_handle);
 
@@ -185,7 +185,7 @@ void d2d_conv_console::__conv_service_foreach_cb(
 		int error = conv_service_get_property_string(service_handle,
 				CONV_SERVICE_ID, &id);
 		print_conv_error(error);
-		if(error == CONV_ERROR_NONE) {
+		if (error == CONV_ERROR_NONE) {
 			printf("   id: %s", id);
 			free(id);
 		} else {
@@ -198,7 +198,7 @@ void d2d_conv_console::__conv_service_foreach_cb(
 		int error = conv_service_get_property_string(service_handle,
 				CONV_SERVICE_VERSION, &version);
 		print_conv_error(error);
-		if(error == CONV_ERROR_NONE) {
+		if (error == CONV_ERROR_NONE) {
 			printf("   version: %s", version);
 			free(version);
 		} else {
@@ -214,7 +214,7 @@ conv_device_h d2d_conv_console::get_device_handle_by_handle_string(
 	for(size_t i = 0; i < devices.size(); i ++) {
 		std::stringstream ss;
 		ss << ((void *)devices[i]);
-		if(handle_str == ss.str())
+		if (handle_str == ss.str())
 			return devices[i];
 	}
 	return NULL;
@@ -227,12 +227,12 @@ conv_device_h d2d_conv_console::get_device_handle_by_name(
 		char *cur_name = NULL;
 		conv_device_get_property_string(devices[i],
 				CONV_DEVICE_NAME, &cur_name);
-		if(cur_name && name == cur_name) {
+		if (cur_name && name == cur_name) {
 			free(cur_name);
 			return devices[i];
 		}
 
-		if(cur_name)
+		if (cur_name)
 			free(cur_name);
 	}
 	return NULL;
@@ -253,7 +253,7 @@ conv_service_h d2d_conv_console::get_service_handle_by_handle_string(
 int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	INFO("Starting Convergence Manager");
-	if(cmd.size() != 3) {
+	if (cmd.size() != 3) {
 		printf("Incorrect format of discovery command: "
 				"no start or stop instruction\n");
 		return INCORRECT_COMMAND;
@@ -261,43 +261,43 @@ int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 
 	// Assuming the device is specified with handle
 	conv_device_h device = get_device_handle_by_handle_string(cmd[1]);
-	if(!device)
+	if (!device)
 		// Assuming the device is specified with name
 		device = get_device_handle_by_name(cmd[1]);
 
-	if(!device) {
+	if (!device) {
 		printf("Incorrect handle or name of the device\n");
 		return INCORRECT_COMMAND; // No device handle, can not continue
 	}
 
-	if(cmd[2] == "services") {
+	if (cmd[2] == "services") {
 		const int error = conv_device_foreach_service(device,
 				__conv_service_foreach_cb, NULL);
 		print_conv_error(error);
-	} else if(cmd[2] == "id") {
+	} else if (cmd[2] == "id") {
 		char *id = NULL;
 		const int error = conv_device_get_property_string(device,
 				CONV_DEVICE_ID, &id);
 		print_conv_error(error);
-		if(error == CONV_ERROR_NONE) {
+		if (error == CONV_ERROR_NONE) {
 			printf("%s\n", id);
 			free(id);
 		}
-	} else if(cmd[2] == "name") {
+	} else if (cmd[2] == "name") {
 		char *name = NULL;
 		const int error = conv_device_get_property_string(device,
 				CONV_DEVICE_NAME, &name);
 		print_conv_error(error);
-		if(error == CONV_ERROR_NONE) {
+		if (error == CONV_ERROR_NONE) {
 			printf("%s\n", name);
 			free(name);
 		}
-	} else if(cmd[2] == "type") {
+	} else if (cmd[2] == "type") {
 		char *type = NULL;
 		const int error = conv_device_get_property_string(device,
 				CONV_DEVICE_TYPE, &type);
 		print_conv_error(error);
-		if(error == CONV_ERROR_NONE) {
+		if (error == CONV_ERROR_NONE) {
 			printf("%s\n", type);
 			free(type);
 		}
@@ -307,7 +307,7 @@ int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 
 int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	if(cmd.size() < 2) {
+	if (cmd.size() < 2) {
 		printf("Incorrect format of service command: "
 				"too few parameters\n");
 		return INCORRECT_COMMAND;
@@ -320,13 +320,14 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 		// The arg1 must be service handle
 		//     arg2 must be a command, such as connect, start, etc
 
-		if(cmd.size() < 3) {
+		if (cmd.size() < 3) {
 			printf("Incorrect format of service command: "
 					"too few parameters\n");
 			return INCORRECT_COMMAND;
 		}
 
-		conv_service_h service = get_service_handle_by_handle_string(cmd[1]);
+		conv_service_h service =
+			get_service_handle_by_handle_string(cmd[1]);
 		if (!service) {
 			printf("Incorrect handle of the service\n");
 			return INCORRECT_COMMAND;
@@ -353,7 +354,8 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 		else if (cmd[2] == "read")
 			return process_service_read(service, cmd);
 		else {
-			printf("Unknown service command [%s]\n", cmd[2].c_str());
+			printf("Unknown service command [%s]\n",
+					cmd[2].c_str());
 			return INCORRECT_COMMAND;
 		}
 
@@ -361,7 +363,8 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 	return CONV_ERROR_NONE;
 }
 
-int d2d_conv_console::process_service_create(const std::vector<std::string> &cmd){
+int d2d_conv_console::process_service_create(
+		const std::vector<std::string> &cmd){
 	ScopeLogger();
 	ERR("TODO"); // TODO
 	return CONV_ERROR_NONE;

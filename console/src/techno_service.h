@@ -64,11 +64,16 @@ class _conv_service_handle_mock {
 		int set_listener_cb(conv_service_listener_cb callback,
 				void* user_data);
 		int unset_listener_cb();
-		int start(conv_channel_h channel_handle, conv_payload_h payload);
-		int stop(conv_channel_h channel_handle, conv_payload_h payload);
-		int get(conv_channel_h channel_handle, conv_payload_h payload);
-		int publish(conv_channel_h channel_handle, conv_payload_h payload);
-		int connect(conv_service_connected_cb callback, void* user_data);
+		int start(conv_channel_h channel_handle,
+				conv_payload_h payload);
+		int stop(conv_channel_h channel_handle,
+				conv_payload_h payload);
+		int get(conv_channel_h channel_handle,
+				conv_payload_h payload);
+		int publish(conv_channel_h channel_handle,
+				conv_payload_h payload);
+		int connect(conv_service_connected_cb callback,
+				void* user_data);
 		int disconnect();
 		int get_type(conv_service_e* value);
 		int set_type(conv_service_e value);

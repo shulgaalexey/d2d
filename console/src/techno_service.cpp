@@ -27,7 +27,7 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 {
 	ScopeLogger();
 	_conv_handle_mock *owner = (_conv_handle_mock *)arg;
-	if(!owner)
+	if (!owner)
 		pthread_exit(NULL);
 
 	{ // Immitating discovery iquiry
@@ -43,41 +43,43 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 	}
 
 	while(true) {
-		if(owner->discovery_timeout > 0)  {
+		if (owner->discovery_timeout > 0)  {
 			GTimeVal cur_time;
 			g_get_current_time (&cur_time);
 			long cur_discovery =
 				cur_time.tv_sec - owner->discovery_start_time;
-			if(cur_discovery > owner->discovery_timeout) {
+			if (cur_discovery > owner->discovery_timeout) {
 				_D("DISCOVERY TIMEOUT");
 				_D("DISCOVERY TIMEOUT");
 				_D("DISCOVERY TIMEOUT");
 				_D("DISCOVERY TIMEOUT");
 
-				if(owner->discovery_cb)
+				if (owner->discovery_cb)
 					owner->discovery_cb(NULL,
-							CONV_DISCOVERY_RESULT_FINISHED,
-							owner->discovery_user_data);
+						CONV_DISCOVERY_RESULT_FINISHED,
+						owner->discovery_user_data);
 				pthread_exit(NULL);
 			}
 		}
 
 
-		if(owner->discovering) {
+		if (owner->discovering) {
 
 			// Create new instance of device
 			_conv_device_mock *d = new _conv_device_mock();
 
 			// Invoke discovery callback
-			if(owner->discovery_cb)
+			if (owner->discovery_cb)
 				owner->discovery_cb((conv_device_h)d,
 						CONV_DISCOVERY_RESULT_SUCCESS,
 						owner->discovery_user_data);
 		} else {
 
 			// Invoke discovery finish callback
-			if(owner->discovery_cb)
-				owner->discovery_cb(NULL, CONV_DISCOVERY_RESULT_FINISHED, owner->discovery_user_data);
+			if (owner->discovery_cb)
+				owner->discovery_cb(NULL,
+						CONV_DISCOVERY_RESULT_FINISHED,
+						owner->discovery_user_data);
 			break;
 		}
 		sleep(2);
@@ -85,7 +87,8 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 	pthread_exit(NULL);
 }
 
-int _conv_handle_mock::start_discovery(const int timeout_seconds, conv_discovery_cb callback, void* user_data)
+int _conv_handle_mock::start_discovery(const int timeout_seconds,
+		conv_discovery_cb callback, void* user_data)
 {
 	ScopeLogger();
 
@@ -104,7 +107,7 @@ int _conv_handle_mock::start_discovery(const int timeout_seconds, conv_discovery
 
 	pthread_t thread = 0;
 	const int ret = pthread_create(&thread, NULL, discovery_on_timer, this);
-	if(ret) {
+	if (ret) {
 		std::stringstream ss;
 		ss << "ERROR! pthread_create() return code: " << ret;
 		_E(ss.str());
@@ -121,7 +124,7 @@ int _conv_handle_mock::stop_discovery()
 {
 	ScopeLogger();
 
-	if(discovery_cb)
+	if (discovery_cb)
 		discovery_cb(NULL,
 				CONV_DISCOVERY_RESULT_FINISHED,
 				discovery_user_data);
@@ -192,13 +195,13 @@ int _conv_device_mock::get_property_string(const char* key, char** value)
 {
 	ScopeLogger();
 
-	if(g_strcmp0(key, CONV_DEVICE_ID) == 0) {
+	if (g_strcmp0(key, CONV_DEVICE_ID) == 0) {
 		*value = g_strdup(id.c_str());
-	} else 	if(g_strcmp0(key, CONV_DEVICE_NAME) == 0) {
+	} else 	if (g_strcmp0(key, CONV_DEVICE_NAME) == 0) {
 		*value = g_strdup(name.c_str());
-	} else 	if(g_strcmp0(key, CONV_DEVICE_TYPE) == 0) {
+	} else 	if (g_strcmp0(key, CONV_DEVICE_TYPE) == 0) {
 		*value = g_strdup(type.c_str());
-	} else 	if(g_strcmp0(key, "host_address") == 0) {
+	} else 	if (g_strcmp0(key, "host_address") == 0) {
 		*value = g_strdup(host_address.c_str());
 	} else {
 		*value = g_strdup("Unknown device property key");
@@ -207,7 +210,8 @@ int _conv_device_mock::get_property_string(const char* key, char** value)
 	return CONV_ERROR_NONE;
 }
 
-int _conv_device_mock::foreach_service(conv_service_foreach_cb cb, void* user_data)
+int _conv_device_mock::foreach_service(conv_service_foreach_cb cb,
+		void* user_data)
 {
 	ScopeLogger();
 	for(size_t i = 0; i < services.size(); i ++)
@@ -236,8 +240,9 @@ gboolean _conv_service_handle_mock::listener_func(gpointer user_data)
 {
 	ScopeLogger();
 
-	_conv_service_handle_mock *owner = (_conv_service_handle_mock *)user_data;
-	if(!owner || !owner->listener_callback || !owner->listener_working)
+	_conv_service_handle_mock *owner =
+		(_conv_service_handle_mock *)user_data;
+	if (!owner || !owner->listener_callback || !owner->listener_working)
 		return FALSE;
 
 	conv_channel_h channel = NULL;
@@ -248,12 +253,14 @@ gboolean _conv_service_handle_mock::listener_func(gpointer user_data)
 	conv_payload_create(&payload);
 	conv_payload_set_string(payload, "my_payload", "good-listener-progress");
 
-	owner->listener_callback((conv_service_h)owner, channel, CONV_ERROR_NONE, payload, owner->listener_user_data);
+	owner->listener_callback((conv_service_h)owner, channel,
+			CONV_ERROR_NONE, payload, owner->listener_user_data);
 
 	return TRUE;
 }
 
-int _conv_service_handle_mock::set_listener_cb(conv_service_listener_cb callback,
+int _conv_service_handle_mock::set_listener_cb(
+		conv_service_listener_cb callback,
 		void* user_data)
 {
 	ScopeLogger();
@@ -273,17 +280,18 @@ int _conv_service_handle_mock::unset_listener_cb()
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::start(conv_channel_h channel_handle, conv_payload_h payload)
+int _conv_service_handle_mock::start(conv_channel_h channel_handle,
+		conv_payload_h payload)
 {
 	ScopeLogger();
 
 	// TODO
-	/*if(channel_handle) {
+	/*if (channel_handle) {
 		_conv_channel_handle *c = (_conv_channel_handle *)channel_handle;
 		_D(" ... CHANNEL: %s", c->jchannel.str().c_str());
 	}
 
-	if(payload) {
+	if (payload) {
 		_conv_payload_handle *p = (_conv_payload_handle *)payload;
 		_D(" ... PAYLOAD: %s", p->jpayload.str().c_str());
 	}*/
@@ -291,7 +299,8 @@ int _conv_service_handle_mock::start(conv_channel_h channel_handle, conv_payload
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::stop(conv_channel_h channel_handle, conv_payload_h payload)
+int _conv_service_handle_mock::stop(conv_channel_h channel_handle,
+		conv_payload_h payload)
 {
 	ScopeLogger();
 
@@ -299,7 +308,8 @@ int _conv_service_handle_mock::stop(conv_channel_h channel_handle, conv_payload_
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::get(conv_channel_h channel_handle, conv_payload_h payload)
+int _conv_service_handle_mock::get(conv_channel_h channel_handle,
+		conv_payload_h payload)
 {
 	ScopeLogger();
 
@@ -307,7 +317,8 @@ int _conv_service_handle_mock::get(conv_channel_h channel_handle, conv_payload_h
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::publish(conv_channel_h channel_handle, conv_payload_h payload)
+int _conv_service_handle_mock::publish(conv_channel_h channel_handle,
+		conv_payload_h payload)
 {
 	ScopeLogger();
 
@@ -319,14 +330,16 @@ gboolean _conv_service_handle_mock::connect_func(gpointer user_data)
 {
 	ScopeLogger();
 
-	_conv_service_handle_mock *owner = (_conv_service_handle_mock *)user_data;
-	if(!owner || !owner->connect_callback)
+	_conv_service_handle_mock *owner =
+		(_conv_service_handle_mock *)user_data;
+	if (!owner || !owner->connect_callback)
 		return FALSE;
 
 	conv_payload_h result = NULL;
 	conv_payload_create(&result);
 	conv_payload_set_string(result, "connection", "good-connection-lol");
-	owner->connect_callback((conv_service_h)owner, CONV_ERROR_NONE, result, owner->connect_user_data);
+	owner->connect_callback((conv_service_h)owner,
+			CONV_ERROR_NONE, result, owner->connect_user_data);
 
 	owner->connect_callback = NULL;
 	owner->connect_user_data = NULL;
@@ -334,7 +347,8 @@ gboolean _conv_service_handle_mock::connect_func(gpointer user_data)
 	return FALSE;
 }
 
-int _conv_service_handle_mock::connect(conv_service_connected_cb callback, void* user_data)
+int _conv_service_handle_mock::connect(conv_service_connected_cb callback,
+		void* user_data)
 {
 	ScopeLogger();
 	connect_callback = callback;
@@ -363,15 +377,16 @@ int _conv_service_handle_mock::set_type(conv_service_e value)
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::get_property_string(const char* key, char** value)
+int _conv_service_handle_mock::get_property_string(const char* key,
+		char** value)
 {
 	ScopeLogger();
 
-	if(g_strcmp0(key, "version") == 0) {
+	if (g_strcmp0(key, "version") == 0) {
 		*value = g_strdup(data_version.c_str());
-	} else 	if(g_strcmp0(key, "type") == 0) {
+	} else 	if (g_strcmp0(key, "type") == 0) {
 		*value = g_strdup(data_type.c_str());
-	} else 	if(g_strcmp0(key, CONV_SERVICE_ID) == 0) {
+	} else 	if (g_strcmp0(key, CONV_SERVICE_ID) == 0) {
 		*value = g_strdup(data_uri.c_str());
 	} else {
 		*value = g_strdup("Unknown service property key");
@@ -379,7 +394,8 @@ int _conv_service_handle_mock::get_property_string(const char* key, char** value
 	return CONV_ERROR_NONE;
 }
 
-int _conv_service_handle_mock::set_property_string(const char* key, const char* value)
+int _conv_service_handle_mock::set_property_string(const char* key,
+		const char* value)
 {
 	ScopeLogger();
 	return CONV_ERROR_NONE;

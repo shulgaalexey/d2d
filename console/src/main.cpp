@@ -40,7 +40,8 @@ static void show_usage() {
 	printf(" quit\n");
 }
 
-static void tokenize_command(const std::string &input, std::vector<std::string> *cmd) {
+static void tokenize_command(const std::string &input,
+		std::vector<std::string> *cmd) {
 
 	std::stringstream ss(input);
 	std::string word;
@@ -61,7 +62,7 @@ static bool command_help(const std::vector<std::string> &cmd) {
 static GMainLoop* gMainLoop = NULL;
 gboolean timeout_func_cb(gpointer data)
 {
-	if(gMainLoop)
+	if (gMainLoop)
 	{
 		ALOGD("Main loop will be terminated.");
 		g_main_loop_quit((GMainLoop*)data);
@@ -104,23 +105,23 @@ int main(int argc, char *argv[])
 		getline(std::cin, input);
 		const std::string command = trim(input);
 
-		if(command.empty()) {
+		if (command.empty()) {
 			continue;
 		}
 
 		std::vector<std::string> cmd;
 		tokenize_command(command, &cmd);
 
-		if(command_help(cmd)) {
+		if (command_help(cmd)) {
 			show_usage();
 			continue;
 		}
 
-		if(command_quit(cmd))
+		if (command_quit(cmd))
 			break;
 
 		// Process the command
-		if(cc.process(cmd) == d2d_conv_console::INCORRECT_COMMAND)
+		if (cc.process(cmd) == d2d_conv_console::INCORRECT_COMMAND)
 			show_usage(); // Detected a command instruction
 
 	}

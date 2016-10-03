@@ -30,7 +30,7 @@ EXTAPI void hts_log(int type , int priority , const char *tag , const char *fmt 
 			if (hts_debug_file_fd != -1) {
 				vsnprintf(hts_debug_file_buf,255, fmt , ap );
 				size_t ret = write(hts_debug_file_fd, hts_debug_file_buf, strlen(hts_debug_file_buf));
-				if(ret < 0) {
+				if (ret < 0) {
 					// Do something
 				}
 				close(hts_debug_file_fd);
