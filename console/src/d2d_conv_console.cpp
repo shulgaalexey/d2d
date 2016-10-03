@@ -238,12 +238,21 @@ conv_device_h d2d_conv_console::get_device_handle_by_name(
 	return NULL;
 }
 
+conv_service_h d2d_conv_console::get_service_handle_by_handle_string(
+		const std::string &handle_str) const {
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return NULL;
+}
+
 // commands:
 // device <dhandle1 | TizenA> services
 // device <dhandle1 | TizenA> id
 // device <dhandle1 | TizenA> name
 // device <dhandle1 | TizenA> type
 int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
+	ScopeLogger();
+	INFO("Starting Convergence Manager");
 	if(cmd.size() != 3) {
 		printf("Incorrect format of discovery command: "
 				"no start or stop instruction\n");
@@ -297,107 +306,130 @@ int d2d_conv_console::process_device(const std::vector<std::string> &cmd) {
 }
 
 int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
-	return CONV_ERROR_NONE;
-	/*printf("  BOOOM: process_service >> ");
-	  for(size_t i = 0; i < cmd.size(); i ++)
-	  printf("{%s} ", cmd[i].c_str());
-	  printf("\n");*/
-}
-
-
-
-
-#if 0
-#include "d2d_conv_manager_fake.h"
-#include "scope_logger.h"
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <string>
-#include <vector>
-#include <sstream>
-#include <map>
-
-
-
-static void process_discovery(const std::vector<std::string> &cmd);
-static void process_device(const std::vector<std::string> &cmd);
-static void process_service(const std::vector<std::string> &cmd);
-static void pre_parse_command(const std::string &input, std::vector<std::string> *cmd);
-
-static conv_h __convergence_manager = NULL;
-static std::vector<conv_device_h> __devices;
-
-
-
-
-class ConsoleColorSetter {
-	public:
-		ConsoleColorSetter() {
-			printf("%c[%d;%dm", 0x1B, 0, 32);
-		}
-		~ConsoleColorSetter() {
-			printf("%c[%d;%d;%dm", 0x1B, 0, 0, 0);
-		}
-
-};
-
-int main(int argc, char *argv[])
-{
-	ConsoleColorSetter ccs;
-
-	// Create convergence manager
-	int error = conv_create(&__convergence_manager);
-	print_conv_error(error);
-
-
-	// Continuously process user input
-	std::string input;
-	while(true) {
-		getline(std::cin, input);
-		const std::string command = trim(input);
-
-		if(command.empty()) {
-			continue;
-		}
-
-		std::vector<std::string> cmd;
-		pre_parse_command(command, &cmd);
-
-		if(cmd.empty()) {
-			show_usage();
-			continue;
-		}
-
-		const std::string cmd_type = cmd[0];
-
-		// TODO: link functions to the nodes of behavioural graph
-		if(cmd_type == "quit") {
-			break;
-		} else if(cmd_type == "help")
-			show_usage();
-		else if(cmd_type == "discovery")
-			process_discovery(cmd);
-		else if(cmd_type == "device")
-			process_device(cmd);
-		else if(cmd_type == "service")
-			process_service(cmd);
-		else {
-			// VERY BAD: we shouldn't get there
-			// It indicates the error in pre_parse_command function
-			printf("Incorrect command\n");
-		}
+	ScopeLogger();
+	if(cmd.size() < 2) {
+		printf("Incorrect format of service command: "
+				"too few parameters\n");
+		return INCORRECT_COMMAND;
 	}
 
-	// Destroy convergence manager
-	error = conv_destroy(__convergence_manager);
-	print_conv_error(error);
+	if (cmd[1] == "create") {
+		// Creating serviceA
+		process_service_create(cmd);
+	} else {
+		// The arg1 must be service handle
+		//     arg2 must be a command, such as connect, start, etc
 
-	return 0;
+		if(cmd.size() < 3) {
+			printf("Incorrect format of service command: "
+					"too few parameters\n");
+			return INCORRECT_COMMAND;
+		}
+
+		conv_service_h service = get_service_handle_by_handle_string(cmd[1]);
+		if (!service) {
+			printf("Incorrect handle of the service\n");
+			return INCORRECT_COMMAND;
+		}
+
+		if (cmd[2] == "id")
+			return process_service_id(service);
+		else if (cmd[2] == "name")
+			return process_service_name(service);
+		else if (cmd[2] == "properties")
+			return process_service_properties(service);
+		else if (cmd[2] == "destroy")
+			return process_service_destroy(service);
+		else if (cmd[2] == "connect")
+			return process_service_connect(service, cmd);
+		else if (cmd[2] == "disconnect")
+			return process_service_disconnect(service, cmd);
+		else if (cmd[2] == "start")
+			return process_service_start(service, cmd);
+		else if (cmd[2] == "stop")
+			return process_service_stop(service, cmd);
+		else if (cmd[2] == "send")
+			return process_service_send(service, cmd);
+		else if (cmd[2] == "read")
+			return process_service_read(service, cmd);
+		else {
+			printf("Unknown service command [%s]\n", cmd[2].c_str());
+			return INCORRECT_COMMAND;
+		}
+
+	}
+	return CONV_ERROR_NONE;
 }
 
+int d2d_conv_console::process_service_create(const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
 
-#endif
+int d2d_conv_console::process_service_id(conv_service_h service){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_name(conv_service_h service){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_properties(conv_service_h service){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_destroy(conv_service_h service){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_connect(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_disconnect(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_start(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_stop(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_send(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+
+int d2d_conv_console::process_service_read(conv_service_h service,
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	ERR("TODO"); // TODO
+	return CONV_ERROR_NONE;
+}
+

@@ -21,11 +21,31 @@ class d2d_conv_console {
 		int process_device(const std::vector<std::string> &cmd);
 		int process_service(const std::vector<std::string> &cmd);
 
+		int process_service_create(const std::vector<std::string> &cmd);
+		int process_service_id(conv_service_h service);
+		int process_service_name(conv_service_h service);
+		int process_service_properties(conv_service_h service);
+		int process_service_destroy(conv_service_h service);
+		int process_service_connect(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_disconnect(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_start(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_stop(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_send(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_read(conv_service_h service,
+				const std::vector<std::string> &cmd);
 
 		conv_device_h get_device_handle_by_handle_string(
 				const std::string &handle_str) const;
 		conv_device_h get_device_handle_by_name(
 				const std::string &name) const;
+
+		conv_service_h get_service_handle_by_handle_string(
+				const std::string &handle_str) const;
 
 		static void __conv_discovery_cb(conv_device_h device_handle,
 				conv_discovery_result_e result, void* user_data);

@@ -11,7 +11,7 @@ help                                               - print instructions
 
 discovery start <timeout_seconds>                  - start or stop discovery
 
-device <handle> service | id | name | type         - get device services and properties
+device <handle> services | id | name | type        - get device services and properties
 
 service <handle> id | type | properties            - get service properties
 service create                                     - create local service
