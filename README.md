@@ -13,7 +13,9 @@ discovery start <timeout_seconds>                  - start or stop discovery
 
 device <handle> services | id | name | type        - get device services and properties
 
-service <handle> id | type | properties            - get service properties
+service <handle> id | version | name [<value>]     - get or set service id, version or name
+service <handle> poperty <prop_name> [<value>]     - get or set service property by name
+service <handle> type                              - get service type
 service create                                     - create local service
 service <handle> destroy                           - destroy local service
 

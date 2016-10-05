@@ -22,9 +22,14 @@ class d2d_conv_console {
 		int process_service(const std::vector<std::string> &cmd);
 
 		int process_service_create(const std::vector<std::string> &cmd);
-		int process_service_id(conv_service_h service);
-		int process_service_name(conv_service_h service);
-		int process_service_properties(conv_service_h service);
+		int process_service_id(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_version(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_name(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_properties(conv_service_h service,
+				const std::vector<std::string> &cmd);
 		int process_service_destroy(conv_service_h service);
 		int process_service_connect(conv_service_h service,
 				const std::vector<std::string> &cmd);

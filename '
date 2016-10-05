@@ -340,7 +340,7 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 			return process_service_version(service, cmd);
 		else if (cmd[2] == "name")
 			return process_service_name(service, cmd);
-		else if (cmd[2] == "property")
+		else if (cmd[2] == "properties")
 			return process_service_properties(service, cmd);
 		// TODO Get Type
 		else if (cmd[2] == "destroy")
@@ -472,21 +472,17 @@ int d2d_conv_console::process_service_properties(conv_service_h service,
 		}
 		return error;
 	} else if(cmd.size() == 4) { // Retrieve Property by Key
-		char *prop = NULL;
+		char *name = NULL;
 		const int error = conv_service_get_property_string(
-				service, cmd[3].c_str(), &prop);
+				service, "name", &name);
 		if (error != CONV_ERROR_NONE) {
 			print_conv_error(error);
 			return error;
 		}
 
-		printf("%s\n", prop); // Output on the console
-		free(prop);
+		printf("%s\n", name); // Output on the console
+		free(name);
 		return CONV_ERROR_NONE;
-	} else {
-		ERR("Not enough parameters");
-		printf("Not enought parameters\n");
-		return CONV_ERROR_INVALID_PARAMETER;
 	}
 }
 
