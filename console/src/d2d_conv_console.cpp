@@ -341,8 +341,9 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 		else if (cmd[2] == "name")
 			return process_service_name(service, cmd);
 		else if (cmd[2] == "property")
-			return process_service_properties(service, cmd);
-		// TODO Get Type
+			return process_service_property(service, cmd);
+		else if (cmd[2] == "type")
+			return process_service_type(service, cmd);
 		else if (cmd[2] == "destroy")
 			return process_service_destroy(service);
 		else if (cmd[2] == "connect")
@@ -458,7 +459,7 @@ int d2d_conv_console::process_service_name(conv_service_h service,
 	}
 }
 
-int d2d_conv_console::process_service_properties(conv_service_h service,
+int d2d_conv_console::process_service_property(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	if (!service)
@@ -487,6 +488,63 @@ int d2d_conv_console::process_service_properties(conv_service_h service,
 		ERR("Not enough parameters");
 		printf("Not enought parameters\n");
 		return CONV_ERROR_INVALID_PARAMETER;
+	}
+}
+
+conv_service_e d2d_conv_console::str_to_service_type(const std::string str) {
+	if (str == "CONV_SERVICE_APP_TO_APP_COMMUNICATION")
+		return CONV_SERVICE_APP_TO_APP_COMMUNICATION;
+	else if (str == "CONV_SERVICE_REMOTE_APP_CONTROL")
+		return CONV_SERVICE_REMOTE_APP_CONTROL;
+	else if (str == "CONV_SERVICE_REMOTE_INTERACTION")
+		return CONV_SERVICE_REMOTE_INTERACTION;
+	else
+		return CONV_SERVICE_NONE;
+}
+
+std::string d2d_conv_console::service_type_to_str(const conv_service_e type) {
+	if (type == CONV_SERVICE_APP_TO_APP_COMMUNICATION)
+		return "CONV_SERVICE_APP_TO_APP_COMMUNICATION";
+	else if (type == CONV_SERVICE_REMOTE_APP_CONTROL)
+		return "CONV_SERVICE_REMOTE_APP_CONTROL";
+	else if (type == CONV_SERVICE_REMOTE_INTERACTION)
+		return "CONV_SERVICE_REMOTE_INTERACTION";
+	else
+		return "CONV_SERVICE_NONE";
+}
+
+int d2d_conv_console::process_service_type(conv_service_h service,
+		const std::vector<std::string> &cmd) {
+	ScopeLogger();
+	if (!service)
+		return CONV_ERROR_INVALID_PARAMETER;
+
+	if (cmd.size() > 3) { // Update Type
+		const conv_service_e type = str_to_service_type(cmd[4]);
+		if (type == CONV_SERVICE_NONE) {
+			ERR("Invalid Service Type [%s]", cmd[4].c_str());
+			printf("Invalid Service Type [%s]\n", cmd[4].c_str());
+			return CONV_ERROR_INVALID_PARAMETER;
+		}
+		const int error = conv_service_set_type(
+				service, type);
+		if (error != CONV_ERROR_NONE) {
+			print_conv_error(error);
+		}
+		return error;
+	} else { // Retrieve Type
+		conv_service_e type = CONV_SERVICE_NONE;
+		const int error = conv_service_get_type(
+				service, &type);
+		if (error != CONV_ERROR_NONE) {
+			print_conv_error(error);
+			return error;
+		}
+
+		// TODO wrap all "printf" in a helper function to have
+		// an option to tune the output
+		printf("%s\n", service_type_to_str(type).c_str()); // Output on the console
+		return CONV_ERROR_NONE;
 	}
 }
 

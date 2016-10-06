@@ -28,7 +28,9 @@ class d2d_conv_console {
 				const std::vector<std::string> &cmd);
 		int process_service_name(conv_service_h service,
 				const std::vector<std::string> &cmd);
-		int process_service_properties(conv_service_h service,
+		int process_service_property(conv_service_h service,
+				const std::vector<std::string> &cmd);
+		int process_service_type(conv_service_h service,
 				const std::vector<std::string> &cmd);
 		int process_service_destroy(conv_service_h service);
 		int process_service_connect(conv_service_h service,
@@ -56,6 +58,13 @@ class d2d_conv_console {
 			conv_discovery_result_e result, void* user_data);
 		static void __conv_service_foreach_cb(
 				conv_service_h service_handle, void* user_data);
+
+
+		static conv_service_e str_to_service_type(
+				const std::string str);
+		static std::string service_type_to_str(
+				const conv_service_e type);
+
 	public:
 		static const int INCORRECT_COMMAND = CONV_ERROR_NO_DATA + 1000;
 	private:
