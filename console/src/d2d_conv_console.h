@@ -33,6 +33,8 @@ class d2d_conv_console {
 				const std::vector<std::string> &cmd);
 		int process_service_type(conv_service_h service,
 				const std::vector<std::string> &cmd);
+		int process_service_constate(conv_service_h service,
+				const std::vector<std::string> &cmd);
 		int process_service_destroy(conv_service_h service);
 		int process_service_connect(conv_service_h service,
 				const std::vector<std::string> &cmd);
@@ -65,6 +67,8 @@ class d2d_conv_console {
 				const std::string str);
 		static std::string service_type_to_str(
 				const conv_service_e type);
+		static std::string service_constate_to_str(
+				const conv_service_connection_state_e state);
 
 		void store_local_service(conv_service_h service);
 

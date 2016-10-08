@@ -350,6 +350,10 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 			return process_service_property(service, cmd);
 		else if (cmd[2] == "type")
 			return process_service_type(service, cmd);
+		else if (cmd[2] == "constate")
+			return process_service_constate(service, cmd);
+		else if (cmd[2] == "create")
+			return process_service_create(cmd);
 		else if (cmd[2] == "destroy")
 			return process_service_destroy(service);
 		else if (cmd[2] == "connect")
@@ -512,6 +516,21 @@ std::string d2d_conv_console::service_type_to_str(const conv_service_e type) {
 		return "CONV_SERVICE_NONE";
 }
 
+std::string d2d_conv_console::service_constate_to_str(
+		const conv_service_connection_state_e state) {
+	if (state == CONV_SERVICE_CONNECTION_STATE_NONE)
+		return "CONV_SERVICE_CONNECTION_STATE_NONE";
+	else if (state == CONV_SERVICE_CONNECTION_STATE_CONNECTED)
+		return "CONV_SERVICE_CONNECTION_STATE_CONNECTED";
+	else if (state == CONV_SERVICE_CONNECTION_STATE_NOT_CONNECTED)
+		return "CONV_SERVICE_CONNECTION_STATE_NOT_CONNECTED";
+	else if (state == CONV_SERVICE_CONNECTION_STATE_CONNECTING)
+		return "CONV_SERVICE_CONNECTION_STATE_CONNECTING";
+	else
+		return "CONV_SERVICE_CONNECTION_STATE_NONE";
+}
+
+
 int d2d_conv_console::process_service_type(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
@@ -548,6 +567,26 @@ int d2d_conv_console::process_service_type(conv_service_h service,
 	}
 }
 
+int d2d_conv_console::process_service_constate(conv_service_h service,
+		const std::vector<std::string> &cmd) {
+	ScopeLogger();
+	if (!service)
+		return CONV_ERROR_INVALID_PARAMETER;
+
+	conv_service_connection_state_e state =
+		CONV_SERVICE_CONNECTION_STATE_NONE;
+	const int error = conv_service_get_connection_state(
+			service, &state);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+		return error;
+	}
+
+	printf("%s\n", service_constate_to_str(state).c_str()); // Output on the console
+	return CONV_ERROR_NONE;
+}
+
+
 void d2d_conv_console::store_local_service(conv_service_h service) {
 	local_services[service] = service;
 }
@@ -562,6 +601,7 @@ int d2d_conv_console::process_service_create(
 		print_conv_error(error);
 		return error;
 	}
+	printf("0x%p", (void *)service);
 
 	store_local_service(service);
 

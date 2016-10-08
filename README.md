@@ -17,10 +17,14 @@ service <handle> id | version | name [<value>]     - get or set service id, vers
 service <handle> poperty <prop_name> [<value>]     - get or set service property by name
 service <handle> type [<value>]                    - get or set service type
 
+service <handle> constate                          - get connection state
+
 service create [<type>]                            - create local service
 service <handle> destroy                           - destroy local service
 
 service <handle> connect | disconnect              - connect or disconnect service
+
+
 service <handle> start | stop [channel] [payload]  - start or stop service
 service <handle> send | read [channel] [payload]   - send or read data of service
 
