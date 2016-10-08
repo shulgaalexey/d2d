@@ -631,17 +631,35 @@ int d2d_conv_console::process_service_destroy(conv_service_h service){
 	return error;
 }
 
+void d2d_conv_console::__conv_service_connected_cb(
+		conv_service_h service_handle,
+		conv_error_e error,
+		conv_payload_h result, void* user_data) {
+	if (error == CONV_ERROR_NONE) {
+		printf("Service 0x%p connected", (void *)service_handle);
+	} else {
+		print_conv_error(error);
+	}
+}
+
 int d2d_conv_console::process_service_connect(conv_service_h service,
 		const std::vector<std::string> &cmd){
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
+	const int error = conv_service_connect(service,
+			__conv_service_connected_cb, NULL);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+	return error;
 }
 
 int d2d_conv_console::process_service_disconnect(conv_service_h service,
 		const std::vector<std::string> &cmd){
 	ScopeLogger();
-	ERR("TODO"); // TODO
+	const int error = conv_service_disconnect(service);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
 	return CONV_ERROR_NONE;
 }
 

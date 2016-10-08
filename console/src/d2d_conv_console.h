@@ -62,6 +62,10 @@ class d2d_conv_console {
 		static void __conv_service_foreach_cb(
 				conv_service_h service_handle, void* user_data);
 
+		static void __conv_service_connected_cb(
+				conv_service_h service_handle,
+				conv_error_e error,
+				conv_payload_h result, void* user_data);
 
 		static conv_service_e str_to_service_type(
 				const std::string str);
