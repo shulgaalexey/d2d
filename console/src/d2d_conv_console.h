@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <d2d_conv_manager.h>
 
 class d2d_conv_console {
@@ -65,12 +66,15 @@ class d2d_conv_console {
 		static std::string service_type_to_str(
 				const conv_service_e type);
 
+		void store_local_service(conv_service_h service);
+
 	public:
 		static const int INCORRECT_COMMAND = CONV_ERROR_NO_DATA + 1000;
 	private:
 		conv_h convergence_manager;
 		std::vector<conv_device_h> devices; // Discovered devices
 							// TODO use map for this
+		std::map<conv_service_h, conv_service_h> local_services;
 
 };
 

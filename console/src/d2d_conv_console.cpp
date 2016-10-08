@@ -243,6 +243,12 @@ conv_service_h d2d_conv_console::get_service_handle_by_handle_string(
 		const std::string &handle_str) const {
 	ScopeLogger();
 	ERR("TODO"); // TODO
+
+	printf("TODO");
+
+	// 1. Search in registered devices
+
+	// 2. Search in a list of local serices
 	return NULL;
 }
 
@@ -365,13 +371,6 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 		}
 
 	}
-	return CONV_ERROR_NONE;
-}
-
-int d2d_conv_console::process_service_create(
-		const std::vector<std::string> &cmd){
-	ScopeLogger();
-	ERR("TODO"); // TODO
 	return CONV_ERROR_NONE;
 }
 
@@ -543,15 +542,53 @@ int d2d_conv_console::process_service_type(conv_service_h service,
 
 		// TODO wrap all "printf" in a helper function to have
 		// an option to tune the output
+
 		printf("%s\n", service_type_to_str(type).c_str()); // Output on the console
 		return CONV_ERROR_NONE;
 	}
 }
 
+void d2d_conv_console::store_local_service(conv_service_h service) {
+	local_services[service] = service;
+}
+
+int d2d_conv_console::process_service_create(
+		const std::vector<std::string> &cmd){
+	ScopeLogger();
+	conv_service_h service = NULL;
+	int error = conv_service_create(&service);
+	if (error != CONV_ERROR_NONE) {
+		ERR("Failed creating service handle");
+		print_conv_error(error);
+		return error;
+	}
+
+	store_local_service(service);
+
+	if (cmd.size() > 2) { // Set Type
+		const conv_service_e type = str_to_service_type(cmd[3]);
+		if (type == CONV_SERVICE_NONE) {
+			ERR("Invalid Service Type [%s]", cmd[3].c_str());
+			printf("Invalid Service Type [%s]\n", cmd[3].c_str());
+			return CONV_ERROR_INVALID_PARAMETER;
+		}
+		error = conv_service_set_type(service, type);
+		if (error != CONV_ERROR_NONE) {
+			print_conv_error(error);
+		}
+		return error;
+	}
+	return CONV_ERROR_NONE;
+}
+
 int d2d_conv_console::process_service_destroy(conv_service_h service){
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
+	const int error = conv_service_destroy(service);
+	if (error != CONV_ERROR_NONE) {
+		ERR("Failed destroying service handle");
+		print_conv_error(error);
+	}
+	return error;
 }
 
 int d2d_conv_console::process_service_connect(conv_service_h service,

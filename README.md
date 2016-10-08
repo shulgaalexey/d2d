@@ -16,7 +16,8 @@ device <handle> services | id | name | type        - get device services and pro
 service <handle> id | version | name [<value>]     - get or set service id, version or name
 service <handle> poperty <prop_name> [<value>]     - get or set service property by name
 service <handle> type [<value>]                    - get or set service type
-service create                                     - create local service
+
+service create [<type>]                            - create local service
 service <handle> destroy                           - destroy local service
 
 service <handle> connect | disconnect              - connect or disconnect service
