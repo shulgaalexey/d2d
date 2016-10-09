@@ -4,7 +4,7 @@
 #include <sstream>
 #include "common.h"
 #include "scope_logger.h"
-
+#include "picojson.h"
 
 d2d_conv_console::d2d_conv_console() {
 }
