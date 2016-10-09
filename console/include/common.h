@@ -58,9 +58,9 @@ void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
 
 #elif defined(_DEBUG) || defined(USE_DLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define DBG(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
 
 #elif defined(USE_FILE_DEBUG)
 

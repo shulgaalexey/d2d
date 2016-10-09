@@ -34,9 +34,9 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${rpkgs-dlog_LDFLAGS} ${rpkgs-glib_LDFLAGS
 
 # Set CFLAGS
 ADD_DEFINITIONS(-Wall -O3)
-SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=C++0x")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -omit-frame-pointer -std=gnu++0x")
+#SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=C++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -omit-frame-pointer -std=gnu++0x")
 
 # Move result binary to the target position(/usr/bin)
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION bin)
