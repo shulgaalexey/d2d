@@ -42,10 +42,10 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 		_D("BOOOM!!!");
 	}
 
-	while(true) {
+	while (true) {
 		if (owner->discovery_timeout > 0)  {
 			GTimeVal cur_time;
-			g_get_current_time (&cur_time);
+			g_get_current_time(&cur_time);
 			long cur_discovery =
 				cur_time.tv_sec - owner->discovery_start_time;
 			if (cur_discovery > owner->discovery_timeout) {
@@ -64,7 +64,6 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 
 
 		if (owner->discovering) {
-
 			// Create new instance of device
 			_conv_device_mock *d = new _conv_device_mock();
 
@@ -74,7 +73,6 @@ void *_conv_handle_mock::discovery_on_timer(void *arg)
 						CONV_DISCOVERY_RESULT_SUCCESS,
 						owner->discovery_user_data);
 		} else {
-
 			// Invoke discovery finish callback
 			if (owner->discovery_cb)
 				owner->discovery_cb(NULL,
@@ -154,7 +152,7 @@ _conv_device_mock::_conv_device_mock()
 		do { // FIXME There is a bug in this key generator
 			ss << letters[cur_device_cnt % 26];
 			cur_device_cnt /= 26;
-		} while(cur_device_cnt);
+		} while (cur_device_cnt);
 		name = ss.str();
 	}
 
@@ -180,13 +178,13 @@ _conv_device_mock::_conv_device_mock()
 
 	services.push_back(s);
 
-	__device_cnt ++;
+	__device_cnt++;
 }
 
 _conv_device_mock::~_conv_device_mock()
 {
 	ScopeLogger();
-	for(size_t i = 0; i < services.size(); i ++)
+	for (size_t i = 0; i < services.size(); i ++)
 		delete services[i];
 	services.clear();
 }
@@ -214,7 +212,7 @@ int _conv_device_mock::foreach_service(conv_service_foreach_cb cb,
 		void* user_data)
 {
 	ScopeLogger();
-	for(size_t i = 0; i < services.size(); i ++)
+	for (size_t i = 0; i < services.size(); i ++)
 		cb((conv_service_h)services[i], user_data);
 	return CONV_ERROR_NONE;
 }
@@ -267,7 +265,7 @@ int _conv_service_handle_mock::set_listener_cb(
 	listener_callback = callback;
 	listener_user_data = user_data;
 	listener_working = true;
-	g_timeout_add_seconds (1, listener_func, this);
+	g_timeout_add_seconds(1, listener_func, this);
 	return CONV_ERROR_NONE;
 }
 
@@ -353,7 +351,7 @@ int _conv_service_handle_mock::connect(conv_service_connected_cb callback,
 	ScopeLogger();
 	connect_callback = callback;
 	connect_user_data = user_data;
-	g_timeout_add_seconds (1, connect_func, this);
+	g_timeout_add_seconds(1, connect_func, this);
 	return CONV_ERROR_NONE;
 }
 

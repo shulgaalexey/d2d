@@ -38,7 +38,6 @@ void d2d_conv_console::print_conv_error(const int error) {
 		default:
 			err = "UNKNOWN ERROR CODE";
 			break;
-
 	}
 	printf("D2D ERROR: %s\n", err.c_str());
 	ERR("D2D ERROR: %s", err.c_str());
@@ -68,13 +67,13 @@ int d2d_conv_console::process(std::vector<std::string> &cmd) {
 	const std::string cmd_type = cmd[0];
 
 	// Initial dispatching: which part of API is required
-	if (cmd_type == "discovery")
+	if (cmd_type == "discovery") {
 		return process_discovery(cmd);
-	else if (cmd_type == "device")
+	} else if (cmd_type == "device") {
 		return process_device(cmd);
-	else if (cmd_type == "service")
+	} else if (cmd_type == "service") {
 		return process_service(cmd);
-	else {
+	} else {
 		// VERY BAD: we shouldn't get there
 		// It indicates the error in command instruction
 		ERR("Incorrect command instruction\n");
@@ -96,9 +95,7 @@ int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
 	}
 
 	if (cmd[1] == "start") {
-
-		// Reset device list
-		devices.clear();
+		devices.clear(); // Reset device list
 
 		int timeout_seconds = 0; // default value
 
@@ -127,7 +124,6 @@ void d2d_conv_console::__conv_discovery_cb(conv_device_h device_handle,
 
 	switch(result) {
 	case CONV_DISCOVERY_RESULT_SUCCESS: {
-
 		// Get general device parameters
 		char *id = NULL;
 		conv_device_get_property_string(device_handle,
@@ -212,7 +208,7 @@ void d2d_conv_console::__conv_service_foreach_cb(
 conv_device_h d2d_conv_console::get_device_handle_by_handle_string(
 		const std::string &handle_str) const {
 	ScopeLogger();
-	for(size_t i = 0; i < devices.size(); i ++) {
+	for (size_t i = 0; i < devices.size(); i ++) {
 		std::stringstream ss;
 		ss << ((void *)devices[i]);
 		if (handle_str == ss.str())
@@ -224,7 +220,7 @@ conv_device_h d2d_conv_console::get_device_handle_by_handle_string(
 conv_device_h d2d_conv_console::get_device_handle_by_name(
 		const std::string &name) const {
 	ScopeLogger();
-	for(size_t i = 0; i < devices.size(); i ++) {
+	for (size_t i = 0; i < devices.size(); i ++) {
 		char *cur_name = NULL;
 		conv_device_get_property_string(devices[i],
 				CONV_DEVICE_NAME, &cur_name);
@@ -340,40 +336,39 @@ int d2d_conv_console::process_service(const std::vector<std::string> &cmd) {
 			return INCORRECT_COMMAND;
 		}
 
-		if (cmd[2] == "id")
+		if (cmd[2] == "id") {
 			return process_service_id(service, cmd);
-		else if (cmd[2] == "version")
+		} else if (cmd[2] == "version") {
 			return process_service_version(service, cmd);
-		else if (cmd[2] == "name")
+		} else if (cmd[2] == "name") {
 			return process_service_name(service, cmd);
-		else if (cmd[2] == "property")
+		} else if (cmd[2] == "property") {
 			return process_service_property(service, cmd);
-		else if (cmd[2] == "type")
+		} else if (cmd[2] == "type") {
 			return process_service_type(service, cmd);
-		else if (cmd[2] == "constate")
+		} else if (cmd[2] == "constate") {
 			return process_service_constate(service, cmd);
-		else if (cmd[2] == "create")
+		} else if (cmd[2] == "create") {
 			return process_service_create(cmd);
-		else if (cmd[2] == "destroy")
+		} else if (cmd[2] == "destroy") {
 			return process_service_destroy(service);
-		else if (cmd[2] == "connect")
+		} else if (cmd[2] == "connect") {
 			return process_service_connect(service, cmd);
-		else if (cmd[2] == "disconnect")
+		} else if (cmd[2] == "disconnect") {
 			return process_service_disconnect(service, cmd);
-		else if (cmd[2] == "start")
+		} else if (cmd[2] == "start") {
 			return process_service_start(service, cmd);
-		else if (cmd[2] == "stop")
+		} else if (cmd[2] == "stop") {
 			return process_service_stop(service, cmd);
-		else if (cmd[2] == "send")
+		} else if (cmd[2] == "send") {
 			return process_service_send(service, cmd);
-		else if (cmd[2] == "read")
+		} else if (cmd[2] == "read") {
 			return process_service_read(service, cmd);
-		else {
+		} else {
 			printf("Unknown service command [%s]\n",
 					cmd[2].c_str());
 			return INCORRECT_COMMAND;
 		}
-
 	}
 	return CONV_ERROR_NONE;
 }
@@ -475,7 +470,7 @@ int d2d_conv_console::process_service_property(conv_service_h service,
 			print_conv_error(error);
 		}
 		return error;
-	} else if(cmd.size() == 4) { // Retrieve Property by Key
+	} else if (cmd.size() == 4) { // Retrieve Property by Key
 		char *prop = NULL;
 		const int error = conv_service_get_property_string(
 				service, cmd[3].c_str(), &prop);
@@ -666,9 +661,8 @@ int d2d_conv_console::process_service_disconnect(conv_service_h service,
 void d2d_conv_console::extract_channel_and_payload_from_command(
 		const std::vector<std::string> &cmd, size_t start_idx,
 		conv_channel_h *chan, conv_payload_h *payload) {
-
 	std::string channel_and_payload;
-	for(size_t i = start_idx; i < cmd.size(); i ++)
+	for (size_t i = start_idx; i < cmd.size(); i ++)
 		channel_and_payload += cmd[i] + " ";
 
 	if (channel_and_payload.empty())
@@ -681,9 +675,9 @@ void d2d_conv_console::extract_channel_and_payload_from_command(
 	int br_cnt = 0;
 	for (size_t i = 0; (i < channel_and_payload.length()) && (br_cnt >= 0); i ++) {
 		if (channel_and_payload[i] == '{') {
-			br_cnt ++;
-		} else if(channel_and_payload[i] == '}') {
-			br_cnt --;
+			br_cnt++;
+		} else if (channel_and_payload[i] == '}') {
+			br_cnt--;
 			if (!br_cnt) {
 				chan_str = channel_and_payload.substr(
 						start_pos, i - start_pos + 1);
@@ -700,16 +694,16 @@ void d2d_conv_console::extract_channel_and_payload_from_command(
 	// Extracting payload JSON string
 	std::string payload_str;
 	br_cnt = 0;
-	if(end_pos > 0)
+	if (end_pos > 0)
 		start_pos = end_pos + 1;
 	else
 		start_pos = int(channel_and_payload.length());
 	for (int i = start_pos;
 			(i < int(channel_and_payload.length())) && (br_cnt >= 0); i ++) {
 		if (channel_and_payload[i] == '{') {
-			br_cnt ++;
-		} else if(channel_and_payload[i] == '}') {
-			br_cnt --;
+			br_cnt++;
+		} else if (channel_and_payload[i] == '}') {
+			br_cnt--;
 			if (!br_cnt) {
 				payload_str = channel_and_payload.substr(
 						start_pos, i - start_pos + 1);
@@ -749,7 +743,7 @@ void d2d_conv_console::create_channel_from_json(const std::string &chan_str,
 
 	do {
 		// check if the type of the value is "object"
-		if (! channel_json.is<picojson::object>()) {
+		if (!channel_json.is<picojson::object>()) {
 			error = CONV_ERROR_INVALID_PARAMETER;
 			break;
 		}
@@ -799,7 +793,7 @@ void d2d_conv_console::create_payload_from_json(const std::string &payload_str,
 
 	do {
 		// check if the type of the value is "object"
-		if (! payload_json.is<picojson::object>()) {
+		if (!payload_json.is<picojson::object>()) {
 			error = CONV_ERROR_INVALID_PARAMETER;
 			break;
 		}
@@ -810,7 +804,6 @@ void d2d_conv_console::create_payload_from_json(const std::string &payload_str,
 		for (picojson::value::object::const_iterator i = obj.begin();
 				i != obj.end();
 				++i) {
-
 			// TODO figure out how to set byte array or other
 			// sorts of payloads
 
@@ -818,7 +811,6 @@ void d2d_conv_console::create_payload_from_json(const std::string &payload_str,
 					i->first.c_str(),
 					i->second.to_str().c_str());
 		}
-
 	} while (false);
 
 	if (error != CONV_ERROR_NONE) {

@@ -25,7 +25,7 @@ enum hts_priority_type {
 	D2D_LOG_INFO		= 3,
 };
 
-void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
+void hts_log(int type, int priority, const char *tag, const char *fmt, ...);
 
 
 #define MICROSECONDS(tv)        ((tv.tv_sec * 1000000ll) + tv.tv_usec)
@@ -45,39 +45,39 @@ void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
 
 #if defined(_DEBUG) || defined(USE_FILE_DEBUG)
 
-#define DbgPrint(fmt, arg...)   do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG , "[D2D_MSG_PRT][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define DbgPrint(fmt, arg...)   do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG, "[D2D_MSG_PRT][%s:%d] "fmt"\n", __MODULE__, __LINE__, ##arg); } while (0)
 
 #endif
 
 #if defined(USE_SYSLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
+#define INFO(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
+#define DBG(fmt, arg...) do { hts_log(D2D_LOG_SYSLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
 
 
 #elif defined(_DEBUG) || defined(USE_DLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
+#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
+#define DBG(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> " fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
 
 #elif defined(USE_FILE_DEBUG)
 
-#define ERR(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG ,"[D2D_MSG_ERR][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG ,"[D2D_MSG_DBG][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG ,"[D2D_MSG_INFO][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG, "[D2D_MSG_ERR][%s:%d] "fmt"\n", __MODULE__, __LINE__, ##arg); } while (0)
+#define DBG(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG, "[D2D_MSG_DBG][%s:%d] "fmt"\n", __MODULE__, __LINE__, ##arg); } while (0)
+#define INFO(fmt, arg...)	do { hts_log(D2D_LOG_PRINT_FILE, 0, LOG_TAG, "[D2D_MSG_INFO][%s:%d] "fmt"\n", __MODULE__, __LINE__, ##arg); } while (0)
 
 #elif defined(USE_DLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
+#define INFO(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while (0)
 
 #define DBG(...)
 #define DbgPrint(...)
 
 #else
-#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, fmt , ##arg); } while(0)
+#define ERR(fmt, arg...) do { hts_log(D2D_LOG_DLOG, D2D_LOG_ERR, LOG_TAG, fmt, ##arg); } while (0)
 
 #define DbgPrint(...)
 #define DBG(...)

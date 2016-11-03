@@ -83,7 +83,6 @@ class _conv_service_handle_mock {
 		static gboolean connect_func(gpointer user_data);
 		static gboolean listener_func(gpointer user_data);
 		//static gboolean listener_func(gpointer user_data);
-
 };
 
 #endif // __CONV_TECHNO_SERVICE_H__

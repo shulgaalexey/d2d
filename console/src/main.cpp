@@ -42,7 +42,6 @@ static void show_usage() {
 
 static void tokenize_command(const std::string &input,
 		std::vector<std::string> *cmd) {
-
 	std::stringstream ss(input);
 	std::string word;
 	while (ss >> word) {
@@ -123,7 +122,6 @@ int main(int argc, char *argv[])
 		// Process the command
 		if (cc.process(cmd) == d2d_conv_console::INCORRECT_COMMAND)
 			show_usage(); // Detected a command instruction
-
 	}
 
 	// Destroy convergence manager

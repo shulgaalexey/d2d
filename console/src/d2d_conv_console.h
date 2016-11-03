@@ -93,7 +93,6 @@ class d2d_conv_console {
 		std::vector<conv_device_h> devices; // Discovered devices
 							// TODO use map for this
 		std::map<conv_service_h, conv_service_h> local_services;
-
 };
 
 #endif /* __D2D_CONV_CONSOLE_H__ */

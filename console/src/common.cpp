@@ -28,7 +28,7 @@ EXTAPI void hts_log(int type , int priority , const char *tag , const char *fmt 
 		case D2D_LOG_PRINT_FILE:
 			hts_debug_file_fd = open(D2D_SERVER_MSG_LOG_FILE, O_WRONLY|O_CREAT|O_APPEND, 0644);
 			if (hts_debug_file_fd != -1) {
-				vsnprintf(hts_debug_file_buf,255, fmt , ap );
+				vsnprintf(hts_debug_file_buf, 255, fmt, ap);
 				size_t ret = write(hts_debug_file_fd, hts_debug_file_buf, strlen(hts_debug_file_buf));
 				if (ret < 0) {
 					// Do something

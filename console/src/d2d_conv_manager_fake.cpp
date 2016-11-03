@@ -11,17 +11,17 @@
 int conv_create(conv_h* handle) {
 	ScopeLogger();
 
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	*handle = (conv_h)new(std::nothrow) _conv_handle_mock();
-	if(!(*handle))
+	if (!(*handle))
 		return CONV_ERROR_OUT_OF_MEMORY;
 	return CONV_ERROR_NONE;
 }
 
 int conv_destroy(conv_h handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_handle_mock *h = (_conv_handle_mock *)handle;
 	delete h;
@@ -33,7 +33,7 @@ int conv_discovery_start(conv_h handle,
 		conv_discovery_cb callback, void* user_data) {
 	ScopeLogger();
 
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_handle_mock *cnv = (_conv_handle_mock *)handle;
 	return cnv->start_discovery(timeout_seconds, callback, user_data);
@@ -42,7 +42,7 @@ int conv_discovery_start(conv_h handle,
 int conv_discovery_stop(conv_h handle) {
 	ScopeLogger();
 
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_handle_mock *cnv = (_conv_handle_mock *)handle;
 	cnv->stop_discovery();
@@ -55,7 +55,7 @@ int conv_channel_create(conv_channel_h* handle) {
 	ScopeLogger();
 
 	// TODO
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	return CONV_ERROR_NONE;
 }
@@ -129,7 +129,7 @@ int conv_payload_get_byte(conv_payload_h handle,
 // Service
 int conv_service_create(conv_service_h* handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	*handle = (conv_service_h) new(std::nothrow) _conv_service_handle_mock();
 	return CONV_ERROR_NONE;
@@ -138,7 +138,7 @@ int conv_service_create(conv_service_h* handle) {
 int conv_service_clone(conv_service_h original_handle,
 		conv_service_h* target_handle) {
 	ScopeLogger();
-	if(!original_handle|| !target_handle)
+	if (!original_handle|| !target_handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 
 	_conv_service_handle_mock *cloned =
@@ -154,7 +154,7 @@ int conv_service_clone(conv_service_h original_handle,
 
 int conv_service_destroy(conv_service_h handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	delete s;
@@ -164,7 +164,7 @@ int conv_service_destroy(conv_service_h handle) {
 int conv_service_get_property_string(conv_service_h handle,
 		const char* key, char** value) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->get_property_string(key, value);
@@ -174,7 +174,7 @@ int conv_service_get_property_string(conv_service_h handle,
 int conv_service_set_property_string(conv_service_h handle,
 		const char* key, const char* value) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->set_property_string(key, value);
@@ -190,7 +190,7 @@ int conv_service_get_connection_state(conv_service_h handle,
 
 int conv_service_get_type(conv_service_h handle, conv_service_e* value) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->get_type(value);
@@ -199,7 +199,7 @@ int conv_service_get_type(conv_service_h handle, conv_service_e* value) {
 
 int conv_service_set_type(conv_service_h handle, conv_service_e value) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->set_type(value);
@@ -209,7 +209,7 @@ int conv_service_set_type(conv_service_h handle, conv_service_e value) {
 int conv_service_connect(conv_service_h handle,
 		conv_service_connected_cb callback, void* user_data) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->connect(callback, user_data);
@@ -218,7 +218,7 @@ int conv_service_connect(conv_service_h handle,
 
 int conv_service_disconnect(conv_service_h handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->disconnect();
@@ -228,7 +228,7 @@ int conv_service_disconnect(conv_service_h handle) {
 int conv_service_start(conv_service_h handle,
 		conv_channel_h channel, conv_payload_h payload) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->start(channel, payload);
@@ -238,7 +238,7 @@ int conv_service_start(conv_service_h handle,
 int conv_service_read(conv_service_h handle,
 		conv_channel_h channel, conv_payload_h payload) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->get(channel, payload);
@@ -248,7 +248,7 @@ int conv_service_read(conv_service_h handle,
 int conv_service_publish(conv_service_h handle,
 		conv_channel_h channel, conv_payload_h payload) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->publish(channel, payload);
@@ -258,7 +258,7 @@ int conv_service_publish(conv_service_h handle,
 int conv_service_stop(conv_service_h handle,
 		conv_channel_h channel, conv_payload_h payload) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->stop(channel, payload);
@@ -268,7 +268,7 @@ int conv_service_stop(conv_service_h handle,
 int conv_service_set_listener_cb(conv_service_h handle,
 		conv_service_listener_cb callback, void* user_data) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->set_listener_cb(callback, user_data);
@@ -277,7 +277,7 @@ int conv_service_set_listener_cb(conv_service_h handle,
 
 int conv_service_unset_listener_cb(conv_service_h handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_service_handle_mock *s = (_conv_service_handle_mock *)handle;
 	s->unset_listener_cb();
@@ -289,7 +289,7 @@ int conv_service_unset_listener_cb(conv_service_h handle) {
 int conv_device_clone(conv_device_h original_handle,
 		conv_device_h* target_handle) {
 	ScopeLogger();
-	if(!original_handle || !target_handle)
+	if (!original_handle || !target_handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_device_mock *d = (_conv_device_mock *)original_handle;
 	_conv_device_mock *cloned = new(std::nothrow) _conv_device_mock();
@@ -300,7 +300,7 @@ int conv_device_clone(conv_device_h original_handle,
 
 int conv_device_destroy(conv_device_h handle) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_device_mock *d = (_conv_device_mock *)handle;
 	delete d;
@@ -310,7 +310,7 @@ int conv_device_destroy(conv_device_h handle) {
 int conv_device_get_property_string(conv_device_h handle,
 		const char* key, char** value) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_device_mock *d = (_conv_device_mock *)handle;
 	d->get_property_string(key, value);
@@ -320,7 +320,7 @@ int conv_device_get_property_string(conv_device_h handle,
 int conv_device_foreach_service(conv_device_h handle,
 		conv_service_foreach_cb cb, void* user_data) {
 	ScopeLogger();
-	if(!handle)
+	if (!handle)
 		return CONV_ERROR_INVALID_PARAMETER;
 	_conv_device_mock *d = (_conv_device_mock *)handle;
 	d->foreach_service(cb, user_data);
