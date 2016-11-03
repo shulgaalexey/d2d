@@ -592,7 +592,7 @@ void d2d_conv_console::store_local_service(conv_service_h service) {
 }
 
 int d2d_conv_console::process_service_create(
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	conv_service_h service = NULL;
 	int error = conv_service_create(&service);
@@ -621,7 +621,7 @@ int d2d_conv_console::process_service_create(
 	return CONV_ERROR_NONE;
 }
 
-int d2d_conv_console::process_service_destroy(conv_service_h service){
+int d2d_conv_console::process_service_destroy(conv_service_h service) {
 	ScopeLogger();
 	const int error = conv_service_destroy(service);
 	if (error != CONV_ERROR_NONE) {
@@ -643,7 +643,7 @@ void d2d_conv_console::__conv_service_connected_cb(
 }
 
 int d2d_conv_console::process_service_connect(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	const int error = conv_service_connect(service,
 			__conv_service_connected_cb, NULL);
@@ -654,7 +654,7 @@ int d2d_conv_console::process_service_connect(conv_service_h service,
 }
 
 int d2d_conv_console::process_service_disconnect(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	const int error = conv_service_disconnect(service);
 	if (error != CONV_ERROR_NONE) {
@@ -663,29 +663,207 @@ int d2d_conv_console::process_service_disconnect(conv_service_h service,
 	return CONV_ERROR_NONE;
 }
 
+void d2d_conv_console::extract_channel_and_payload_from_command(
+		const std::vector<std::string> &cmd, size_t start_idx,
+		conv_channel_h *chan, conv_payload_h *payload) {
+
+	std::string channel_and_payload;
+	for(size_t i = start_idx; i < cmd.size(); i ++)
+		channel_and_payload += cmd[i] + " ";
+
+	if (channel_and_payload.empty())
+		return;
+
+	// Extracting channel JSON string
+	std::string chan_str;
+	int start_pos = channel_and_payload.find_first_of('{');
+	int end_pos = -1;
+	int br_cnt = 0;
+	for (size_t i = 0; (i < channel_and_payload.length()) && (br_cnt >= 0); i ++) {
+		if (channel_and_payload[i] == '{') {
+			br_cnt ++;
+		} else if(channel_and_payload[i] == '}') {
+			br_cnt --;
+			if (!br_cnt) {
+				chan_str = channel_and_payload.substr(
+						start_pos, i - start_pos + 1);
+				end_pos = i;
+				break;
+			}
+		}
+	}
+
+	if (chan_str.empty())
+		return; // There is no valid data for channel,
+			// so no way to extract it and a payload too
+
+	// Extracting payload JSON string
+	std::string payload_str;
+	br_cnt = 0;
+	if(end_pos > 0)
+		start_pos = end_pos + 1;
+	else
+		start_pos = int(channel_and_payload.length());
+	for (int i = start_pos;
+			(i < int(channel_and_payload.length())) && (br_cnt >= 0); i ++) {
+		if (channel_and_payload[i] == '{') {
+			br_cnt ++;
+		} else if(channel_and_payload[i] == '}') {
+			br_cnt --;
+			if (!br_cnt) {
+				payload_str = channel_and_payload.substr(
+						start_pos, i - start_pos + 1);
+				break;
+			}
+		}
+	}
+
+	create_channel_from_json(chan_str, chan);
+	create_payload_from_json(chan_str, payload);
+}
+
+void d2d_conv_console::create_channel_from_json(const std::string &chan_str,
+	conv_channel_h *chan) {
+	if (chan_str.empty() || !chan)
+		return;
+
+	// Converting channel string into json
+	const char* json = chan_str.c_str();
+	picojson::value channel_json;
+	std::string err;
+	//const char* json_end =
+	picojson::parse(channel_json, json, json + strlen(json), &err);
+	if (!err.empty()) {
+		//std::cerr << err << std::endl;
+		ERR("Error parsing channel json [%s]", err.c_str());
+		printf("Error parsing channel json [%s]\n", err.c_str());
+	}
+
+	int error = conv_channel_create(chan);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+		return;
+	}
+
+	conv_channel_h handle = *chan;
+
+	do {
+		// check if the type of the value is "object"
+		if (! channel_json.is<picojson::object>()) {
+			error = CONV_ERROR_INVALID_PARAMETER;
+			break;
+		}
+
+		// obtain a const reference to the map, and add the contents
+		// to the handle
+		const picojson::value::object& obj = channel_json.get<picojson::object>();
+		for (picojson::value::object::const_iterator i = obj.begin();
+				i != obj.end();
+				++i) {
+			conv_channel_set_string(handle,
+					i->first.c_str(),
+					i->second.to_str().c_str());
+		}
+	} while (false);
+
+	if (error != CONV_ERROR_NONE) {
+		conv_channel_destroy(handle);
+		*chan = NULL;
+	}
+}
+
+void d2d_conv_console::create_payload_from_json(const std::string &payload_str,
+	conv_payload_h *payload) {
+	if (!payload_str.empty() || !payload)
+	       return;
+
+	// Converting payload string into json
+	const char* json = payload_str.c_str();
+	picojson::value payload_json;
+	std::string err;
+	//const char* json_end =
+	picojson::parse(payload_json, json, json + strlen(json), &err);
+	if (!err.empty()) {
+		//std::cerr << err << std::endl;
+		ERR("Error parsing payload json [%s]", err.c_str());
+		printf("Error parsing payload json [%s]\n", err.c_str());
+	}
+
+	int error = conv_payload_create(payload);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+		return;
+	}
+
+	conv_payload_h handle = *payload;
+
+	do {
+		// check if the type of the value is "object"
+		if (! payload_json.is<picojson::object>()) {
+			error = CONV_ERROR_INVALID_PARAMETER;
+			break;
+		}
+
+		// obtain a const reference to the map, and add the contents
+		// to the handle
+		const picojson::value::object& obj = payload_json.get<picojson::object>();
+		for (picojson::value::object::const_iterator i = obj.begin();
+				i != obj.end();
+				++i) {
+
+			// TODO figure out how to set byte array or other
+			// sorts of payloads
+
+			conv_payload_set_string(handle,
+					i->first.c_str(),
+					i->second.to_str().c_str());
+		}
+
+	} while (false);
+
+	if (error != CONV_ERROR_NONE) {
+		conv_payload_destroy(handle);
+		*payload = NULL;
+	}
+}
+
 int d2d_conv_console::process_service_start(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
+
+	// TODO check if listener is registered
+
+	conv_channel_h chan = NULL;
+	conv_payload_h payload = NULL;
+	extract_channel_and_payload_from_command(cmd, 3, &chan, &payload);
+
+	const int error = conv_service_start(service, chan, payload);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+
+	conv_channel_destroy(chan);
+	conv_payload_destroy(payload);
+
+	return error;
 }
 
 int d2d_conv_console::process_service_stop(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	ERR("TODO"); // TODO
 	return CONV_ERROR_NONE;
 }
 
 int d2d_conv_console::process_service_send(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	ERR("TODO"); // TODO
 	return CONV_ERROR_NONE;
 }
 
 int d2d_conv_console::process_service_read(conv_service_h service,
-		const std::vector<std::string> &cmd){
+		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 	ERR("TODO"); // TODO
 	return CONV_ERROR_NONE;

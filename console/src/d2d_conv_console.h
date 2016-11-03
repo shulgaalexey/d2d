@@ -76,6 +76,16 @@ class d2d_conv_console {
 
 		void store_local_service(conv_service_h service);
 
+		void extract_channel_and_payload_from_command(
+				const std::vector<std::string> &cmd,
+				size_t start_idx,
+				conv_channel_h *chan,
+				conv_payload_h *payload);
+		void create_channel_from_json(const std::string &chan_str,
+				conv_channel_h *chan);
+		void create_payload_from_json(const std::string &payload_str,
+				conv_payload_h *payload);
+
 	public:
 		static const int INCORRECT_COMMAND = CONV_ERROR_NO_DATA + 1000;
 	private:
