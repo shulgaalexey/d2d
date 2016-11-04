@@ -843,21 +843,62 @@ int d2d_conv_console::process_service_start(conv_service_h service,
 int d2d_conv_console::process_service_stop(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
+
+	// TODO check if listener is registered
+
+	conv_channel_h chan = NULL;
+	conv_payload_h payload = NULL;
+	extract_channel_and_payload_from_command(cmd, 3, &chan, &payload);
+
+	const int error = conv_service_stop(service, chan, payload);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+
+	conv_channel_destroy(chan);
+	conv_payload_destroy(payload);
+
+	return error;
 }
 
 int d2d_conv_console::process_service_send(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
+
+	// TODO check if listener is registered
+
+	conv_channel_h chan = NULL;
+	conv_payload_h payload = NULL;
+	extract_channel_and_payload_from_command(cmd, 3, &chan, &payload);
+
+	const int error = conv_service_publish(service, chan, payload);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+
+	conv_channel_destroy(chan);
+	conv_payload_destroy(payload);
+
+	return error;
 }
 
 int d2d_conv_console::process_service_read(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
-	ERR("TODO"); // TODO
-	return CONV_ERROR_NONE;
-}
 
+	// TODO check if listener is registered
+
+	conv_channel_h chan = NULL;
+	conv_payload_h payload = NULL;
+	extract_channel_and_payload_from_command(cmd, 3, &chan, &payload);
+
+	const int error = conv_service_read(service, chan, payload);
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+
+	conv_channel_destroy(chan);
+	conv_payload_destroy(payload);
+
+	return error;
+}
