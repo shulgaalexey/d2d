@@ -86,6 +86,12 @@ class d2d_conv_console {
 		void create_payload_from_json(const std::string &payload_str,
 				conv_payload_h *payload);
 
+
+		int set_listener(conv_service_h service);
+		static void conv_service_listener_cb(conv_service_h service_handle,
+			conv_channel_h channel_handle, conv_error_e error,
+			conv_payload_h result, void* user_data);
+
 	public:
 		static const int INCORRECT_COMMAND = CONV_ERROR_NO_DATA + 1000;
 	private:
@@ -93,6 +99,7 @@ class d2d_conv_console {
 		std::vector<conv_device_h> devices; // Discovered devices
 							// TODO use map for this
 		std::map<conv_service_h, conv_service_h> local_services;
+		std::map<conv_service_h, bool> services_listening;
 };
 
 #endif /* __D2D_CONV_CONSOLE_H__ */

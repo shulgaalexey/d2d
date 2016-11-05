@@ -819,11 +819,34 @@ void d2d_conv_console::create_payload_from_json(const std::string &payload_str,
 	}
 }
 
+void d2d_conv_console::conv_service_listener_cb(conv_service_h service_handle,
+		conv_channel_h channel_handle, conv_error_e error,
+		conv_payload_h result, void* user_data) {
+	if (error != CONV_ERROR_NONE) {
+		print_conv_error(error);
+	}
+
+	// TODO print the payload
+}
+
+int d2d_conv_console::set_listener(conv_service_h service) {
+	if (services_listening.count(service))
+		return CONV_ERROR_NONE;
+	const int error = conv_service_set_listener_cb(service,
+			conv_service_listener_cb, this);
+	if (error == CONV_ERROR_NONE) {
+		services_listening[service] = true;
+	} else {
+		print_conv_error(error);
+	}
+	return error;
+}
+
 int d2d_conv_console::process_service_start(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 
-	// TODO check if listener is registered
+	set_listener(service);
 
 	conv_channel_h chan = NULL;
 	conv_payload_h payload = NULL;
@@ -844,7 +867,7 @@ int d2d_conv_console::process_service_stop(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 
-	// TODO check if listener is registered
+	set_listener(service);
 
 	conv_channel_h chan = NULL;
 	conv_payload_h payload = NULL;
@@ -865,7 +888,7 @@ int d2d_conv_console::process_service_send(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 
-	// TODO check if listener is registered
+	set_listener(service);
 
 	conv_channel_h chan = NULL;
 	conv_payload_h payload = NULL;
@@ -886,7 +909,7 @@ int d2d_conv_console::process_service_read(conv_service_h service,
 		const std::vector<std::string> &cmd) {
 	ScopeLogger();
 
-	// TODO check if listener is registered
+	set_listener(service);
 
 	conv_channel_h chan = NULL;
 	conv_payload_h payload = NULL;
