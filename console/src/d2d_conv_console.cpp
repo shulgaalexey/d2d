@@ -5,6 +5,7 @@
 #include "common.h"
 #include "scope_logger.h"
 #include "picojson.h"
+#include <d2d_conv_internal.h>
 
 d2d_conv_console::d2d_conv_console() {
 }
@@ -824,9 +825,27 @@ void d2d_conv_console::conv_service_listener_cb(conv_service_h service_handle,
 		conv_payload_h result, void* user_data) {
 	if (error != CONV_ERROR_NONE) {
 		print_conv_error(error);
+	} else {
+		printf("listener status: OK");
 	}
 
-	// TODO print the payload
+	if (channel_handle) {
+		char *value = NULL;
+		conv_channel_internal_export_to_string(channel_handle, &value);
+		if (value) {
+			printf("channel: %s\n", value);
+			free(value);
+		}
+	}
+
+	if (result) {
+		char *value = NULL;
+		conv_payload_internal_export_to_string(result, &value);
+		if (value) {
+			printf("payload: %s\n", value);
+			free(value);
+		}
+	}
 }
 
 int d2d_conv_console::set_listener(conv_service_h service) {
