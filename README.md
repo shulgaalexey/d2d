@@ -31,6 +31,78 @@ service <handle> send | read [channel] [payload]   - send or read data of servic
 quit                                               - quit the console
 ```
 
+###Typical usage
+
+Start the console with the command
+
+```
+$ ./d2d
+```
+
+Start the discovery procedure and limit its duration with 60 seconds
+
+```
+discovery start 60
+```
+
+Wait for Convergence Manager discovering nearby devices.
+Eventually the discovered device info will be printed on the console as following:
+
+
+```
+Found device   MyTizenDevice   handle: 0a1b2c3d   type: mobile   id: ABCD-1234
+Found device   MyTizenDevice   handle: 0a1b2c4e   type: TV   id: KLMN-5678
+Found device   MyTizenDevice   handle: 0a1b2c5f   type: wearable   id: GGGG-3333
+```
+
+Browse services of device you are interested in:
+
+```
+device 0a1b2c3d services
+```
+
+Specified device services will be printed on the console as follows:
+
+
+```
+handle: 0bb11cd1  id: AppCommunication  version: 1.0
+handle: 0bb53e76  id: RemoteAppControl  version: 1.0
+```
+
+Check service connection state
+
+
+```
+service 0bb53e76 constate
+
+```
+
+On the console it will be printed the current  connection connection state of the service,
+for example:
+
+```
+CONNECTED
+```
+
+Start the service:
+
+```
+service 0bb53e76 start
+```
+
+In a moment the status of start operation will be printed on the console:
+
+```
+Listener status: OK
+channel: {channel json data}
+payload: {payload json data}
+```
+
+TODO
+
+
+
+
 ## Prerequisites
 
 1. GBS configuration (~/.gbs.conf)

@@ -826,7 +826,7 @@ void d2d_conv_console::conv_service_listener_cb(conv_service_h service_handle,
 	if (error != CONV_ERROR_NONE) {
 		print_conv_error(error);
 	} else {
-		printf("listener status: OK");
+		printf("Listener status: OK");
 	}
 
 	if (channel_handle) {
