@@ -71,23 +71,36 @@ handle: 0bb53e76  id: RemoteAppControl  version: 1.0
 
 Check service connection state
 
-
 ```
 service 0bb53e76 constate
 
 ```
 
-On the console it will be printed the current  connection connection state of the service,
+On the console it will be printed the current connection connection state of the service,
 for example:
 
 ```
 CONNECTED
 ```
 
-Start the service:
+Note it the service state is DISCONNECTED, you should use the command:
 
 ```
-service 0bb53e76 start
+service 0bb53e76 connect
+```
+
+and wait for the confirmation
+
+```
+service 0bb53e76 CONNECTED
+```
+
+Start the service.
+Channel and payload are optional parameter.
+Both should be formatted as json strings.
+
+```
+service 0bb53e76 start {"id": "channel1", "uri": "services/myservice/1"}  {"data": "my data item", "another_data": "my another data item"}
 ```
 
 In a moment the status of start operation will be printed on the console:
@@ -98,9 +111,36 @@ channel: {channel json data}
 payload: {payload json data}
 ```
 
+Send a payload to the specified service channel.
+Channel and payload are optional parameter.
+Both should be formatted as json strings.
+
+```
+service 0bb53e76 send {"id": "channel1", "uri": "services/myservice/1"}  {"data": "my data item", "another_data": "my another data item"}
+```
+
+If the service provides response on this request, the console indicates it
+(similarly to the start operation):
+
+```
+Listener status: OK
+channel: {channel json data}
+payload: {payload json data}
+```
+
+Note, that the read and stop requests to the server are used similarly to the send request.
+
+
+When service is not needed, it should be stoped and disconnected:
+
+```
+service 0bb53e76 stop {"id": "channel1", "uri": "services/myservice/1"}  {"data": "my data item", "another_data": "my another data item"}
+service 0bb53e76 disconnect
+```
+
 TODO
-
-
+1. Prepare script for App Comm Service (both client and server instances)
+2. Prepare script for Remote App Control Service
 
 
 ## Prerequisites
