@@ -23,3 +23,10 @@ std::vector<std::string> d2d_voice_control::process_mic() {
 
 	return cmd;
 }
+
+
+void d2d_voice_control::say(const std::vector<std::string> &text) {
+	// 1. Send the text to the server
+	// 2. Get audio data
+	// 3. Play audio data
+}

@@ -10,6 +10,7 @@ class d2d_voice_control {
 		~d2d_voice_control();
 	public:
 		std::vector<std::string> process_mic();
+		void say(const std::vector<std::string> &text);
 };
 
 
