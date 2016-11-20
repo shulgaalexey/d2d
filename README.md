@@ -143,6 +143,14 @@ TODO
 2. Prepare script for Remote App Control Service
 
 
+###UI
+
+Consider following variants of user interface:
+ * command line interface
+ * graphical user interface
+ * voice user interface
+
+
 ## Prerequisites
 
 1. GBS configuration (~/.gbs.conf)
