@@ -142,6 +142,8 @@ TODO
 1. Prepare script for App Comm Service (both client and server instances)
 2. Prepare script for Remote App Control Service
 
+TODO it would be good to check the features of voice control.
+
 
 ###UI
 
@@ -150,7 +152,11 @@ Consider following variants of user interface:
  * graphical user interface
  * voice user interface
 
+<<<<<<< HEAD
+TODO Think about remote sensor sharing.
+=======
 TODO Think about remote sensor sharing!! ___
+>>>>>>> tizen
 
 
 ## Prerequisites
