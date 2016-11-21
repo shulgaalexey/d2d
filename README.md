@@ -142,7 +142,7 @@ TODO
 1. Prepare script for App Comm Service (both client and server instances)
 2. Prepare script for Remote App Control Service
 
-TODO it would be good to check the features of voice control
+TODO it would be good to check the features of voice control.
 
 
 ###UI
