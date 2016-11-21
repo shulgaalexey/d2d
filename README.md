@@ -150,6 +150,8 @@ Consider following variants of user interface:
  * graphical user interface
  * voice user interface
 
+TODO Think about remote sensor sharing
+
 
 ## Prerequisites
 
