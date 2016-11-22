@@ -1,5 +1,6 @@
 # d2d convergence console
 Command line interface for d2d convergence
+version 0.1
 ==========================================
 
 The terminal of Tizen D2D Convergence Manager
