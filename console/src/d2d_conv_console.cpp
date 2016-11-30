@@ -89,6 +89,12 @@ int d2d_conv_console::process(std::vector<std::string> &cmd) {
 // discovery stop
 int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
 	ScopeLogger();
+
+	DBG("Discovery command processing...");
+	for (size_t i = 0; i < cmd.size(); i ++) {
+		DBG("%s", cmd[i].c_str());
+	}
+
 	if (cmd.size() < 1) {
 		printf("Incorrect format of discovery command: "
 				"no start or stop instruction\n");
@@ -96,12 +102,15 @@ int d2d_conv_console::process_discovery(const std::vector<std::string> &cmd) {
 	}
 
 	if (cmd[1] == "start") {
+		DBG("Discovery starting...");
 		devices.clear(); // Reset device list
 
 		int timeout_seconds = 0; // default value
 
 		if (cmd.size() > 2)
 			timeout_seconds = atoi(cmd[2].c_str());
+
+		DBG("Timeout [%d seconds]", timeout_seconds);
 
 		const int error = conv_discovery_start(convergence_manager,
 				timeout_seconds, __conv_discovery_cb, this);

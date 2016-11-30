@@ -14,12 +14,14 @@
 #include "d2d_conv_console.h"
 
 static std::string trim(const std::string &input) {
-	std::string str = input;
+	// TODO
+	/*std::string str = input;
 	std::stringstream trimmer;
 	trimmer << str;
 	str.clear();
 	trimmer >> str;
-	return str;
+	return str;*/
+	return input;
 }
 
 static void show_usage() {
@@ -42,11 +44,14 @@ static void show_usage() {
 
 static void tokenize_command(const std::string &input,
 		std::vector<std::string> *cmd) {
+	DBG("Tokenizing....<%s>", input.c_str());
 	std::stringstream ss(input);
 	std::string word;
 	while (ss >> word) {
 		cmd->push_back(word);
+		DBG("Extracted token <%s>", word.c_str());
 	}
+	DBG("Tokenization is done, [%u] tokens extracted", cmd->size());
 }
 
 static bool command_quit(const std::vector<std::string> &cmd) {
@@ -102,7 +107,10 @@ int main(int argc, char *argv[])
 	std::string input;
 	while(true) {
 		getline(std::cin, input);
+		DBG("Raw input <%s>", input.c_str());
 		const std::string command = trim(input);
+		DBG("Trimmed input <%s>", command.c_str());
+
 
 		if (command.empty()) {
 			continue;
@@ -127,5 +135,3 @@ int main(int argc, char *argv[])
 	// Destroy convergence manager
 	return cc.stop();
 }
-
-//! End of a file
