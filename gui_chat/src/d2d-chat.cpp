@@ -31,7 +31,7 @@ win_delete_request_cb(void *data , Evas_Object *obj , void *event_info)
 static void
 win_back_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	appdata_s *ad = data;
+	appdata_s *ad = (appdata_s *)data;
 
 	/* Let window go to hide state. */
 	elm_win_lower(ad->win);
@@ -190,7 +190,7 @@ static void
 bubble_box_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Evas_Coord w, h;
-	appdata_s *ad = data;
+	appdata_s *ad = (appdata_s *)data;
 
 	elm_scroller_child_size_get(ad->bubble_scroller, &w, &h);
 	elm_scroller_region_show(ad->bubble_scroller, 0, h, 0, 0);
@@ -224,7 +224,7 @@ send_message(appdata_s *ad)
 static void
 send_button_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	send_message(data);
+	send_message((appdata_s *)data);
 }
 
 static void
@@ -390,7 +390,7 @@ app_create(void *data)
 	   Initialize UI resources and application's data
 	   If this function returns true, the main loop of application starts
 	   If this function returns false, the application is terminated */
-	appdata_s *ad = data;
+	appdata_s *ad = (appdata_s *)data;
 
 	create_base_gui(ad);
 

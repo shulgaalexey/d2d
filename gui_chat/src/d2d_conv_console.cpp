@@ -7,7 +7,7 @@
 #include "picojson.h"
 //#include <d2d_conv_internal.h>
 
-d2d_conv_console::d2d_conv_console() {
+d2d_conv_console::d2d_conv_console() : convergence_manager(NULL) {
 }
 
 d2d_conv_console::~d2d_conv_console() {
