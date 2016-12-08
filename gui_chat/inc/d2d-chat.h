@@ -20,6 +20,13 @@
 
 #define ICON_DIR "/opt/usr/apps/$(packageName)/res/images"
 
+// TODO Fix the logging
+
+#define ERR(fmt, arg...) do { /*hts_log(D2D_LOG_SYSLOG, D2D_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg);*/ } while (0)
+#define INFO(fmt, arg...) do { /*hts_log(D2D_LOG_SYSLOG, D2D_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg);*/ } while (0)
+#define DBG(fmt, arg...) do { /*hts_log(D2D_LOG_SYSLOG, D2D_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg);*/ } while (0)
+
+
 
 #if !defined(PACKAGE)
 #define PACKAGE "org.example.d2d-chat"

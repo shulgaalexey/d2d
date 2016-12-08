@@ -1,4 +1,5 @@
 #include "d2d-chat.h"
+#include "d2d_conv_console.h"
 
 typedef enum {
 	MESSAGE_BUBBLE_NONE = 0,
