@@ -14,7 +14,6 @@
 
 
 #define BUBBLE_TEXT_WIDTH 400
-#define NUM_OF_SAMPLE_MESSAGES 10
 #define BUBBLE_MAIN_TEXT_STYLE "<font_size=40>%s</font_size>"
 #define BUBBLE_SUB_TEXT_STYLE "<font_size=20 font_weight=Bold color=#454545>%s</font_size>"
 

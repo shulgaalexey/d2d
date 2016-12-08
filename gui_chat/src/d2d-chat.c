@@ -21,25 +21,6 @@ typedef struct appdata {
 		int total_messages;
 } appdata_s;
 
-static const char *bubble_messages[] = {
-	"Good morning, Princess?",
-	"It's you again. How do you do this?",
-	"This is the princess who fell from the sky into my arms.",
-	"Yes. We keep meeting like this. You just suddenly show up.",
-	"We could make plans to meet.",
-	"No, it's nicer this way. I hope we meet again suddenly.",
-	"Don't you know that it takes so little to make me happy?",
-	"Good morning, Princess!  ",
-	"This is incredible. You owe me an explanation.",
-	"No, you're the one who owes me an explanation. You've really got a crush on me. Where shall we go, Princess?",
-	NULL
-};
-
-static const char *bubble_times[] = {
-	"10:00 AM", "10:01 AM", "10:02 AM", "10:03 AM", "10:04 AM", "10:05 AM",
-	"3:50 PM", "3:51 PM", "3:52 PM", "3:53 PM", NULL
-};
-
 static void
 win_delete_request_cb(void *data , Evas_Object *obj , void *event_info)
 {
@@ -167,26 +148,6 @@ create_bubble_table(Evas_Object *parent, Message_Bubble_Style style, const char 
 	return bubble_table;
 }
 
-static void
-load_messages(appdata_s *ad)
-{
-	Evas_Object *bubble_table;
-
-	ad->total_messages = NUM_OF_SAMPLE_MESSAGES;
-	ad->num_of_bubbles = 0;
-	int count = ad->total_messages - 1;
-
-	while (count >= 0) {
-		bubble_table = create_bubble_table(ad->bubble_box, count % 2 + 1,
-				bubble_messages[count],
-				bubble_times[count]);
-		evas_object_show(bubble_table);
-		elm_box_pack_start(ad->bubble_box, bubble_table);
-		ad->num_of_bubbles++;
-		count--;
-	}
-}
-
 static char *
 get_current_time()
 {
@@ -202,6 +163,26 @@ get_current_time()
 	eina_strbuf_free(strbuf);
 
 	return ret;
+}
+
+static void
+load_messages(appdata_s *ad)
+{
+	ad->total_messages = 2;
+	ad->num_of_bubbles = 2;
+
+	Evas_Object *bubble_table = create_bubble_table(ad->bubble_box, MESSAGE_BUBBLE_SENT,
+			"GUI Chat?",
+			get_current_time());
+	evas_object_show(bubble_table);
+	elm_box_pack_start(ad->bubble_box, bubble_table);
+
+
+	bubble_table = create_bubble_table(ad->bubble_box, MESSAGE_BUBBLE_RECEIVE,
+			"D2D Convergence Manager",
+			get_current_time());
+	evas_object_show(bubble_table);
+	elm_box_pack_start(ad->bubble_box, bubble_table);
 }
 
 static void
