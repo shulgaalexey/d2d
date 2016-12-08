@@ -149,6 +149,8 @@ TODO
 Consider following variants of user interface:
  * command line interface
  * graphical user interface
+  - The GUI Chat app is created on the base of theMessage Bubble UI sample
+  https://developer.tizen.org/development/sample/native/UI/Message_Bubble_UI
  * voice user interface
 
 TODO Think about remote sensor sharing!! ___
@@ -176,4 +178,5 @@ Many thanks to
 
  * https://github.com/SKKU-ESLAB-Tizen/hello-tizen-service for Tizen service template
  * https://github.com/kazuho/picojson for PicoJSON implementation
+ * https://developer.tizen.org/development/sample/native/UI/Message_Bubble_UI for Bubble UI sample
 
