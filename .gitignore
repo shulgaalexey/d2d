@@ -34,3 +34,10 @@
 
 # test files
 *test*
+
+# tizen studio files
+Debug
+Release
+.rds_delta
+.sdk_delta.info
+.sign
