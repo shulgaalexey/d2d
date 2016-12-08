@@ -172,7 +172,7 @@ load_messages(appdata_s *ad)
 	ad->total_messages = 2;
 	ad->num_of_bubbles = 2;
 
-	Evas_Object *bubble_table = create_bubble_table(ad->bubble_box, MESSAGE_BUBBLE_SENT,
+	Evas_Object *bubble_table = create_bubble_table(ad->bubble_box, MESSAGE_BUBBLE_RECEIVE,
 			"GUI Chat?",
 			get_current_time());
 	evas_object_show(bubble_table);
